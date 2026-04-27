@@ -3,113 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-    <title>LONImeteo v15.1 - TITAN FINAL</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>LONImeteo v17.5 - ANDROID OPTIMIZED</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #ff9500; --glass: rgba(255, 255, 255, 0.04); --border: rgba(255, 255, 255, 0.1); --radius: 40px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        :root { --p: #ff9500; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.2); --radius: 40px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; touch-action: manipulation; }
         body { color: #fff; background: #000; height: 100vh; overflow: hidden; overscroll-behavior-y: none; }
-        #sky-engine { position: fixed; inset: 0; z-index: -1; transition: background 3s ease; background: #000; }
-        #ptr-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; z-index: 50; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
-        #ptr-spinner { width: 28px; height: 28px; border: 3px solid rgba(255,149,0,0.1); border-top-color: var(--p); border-radius: 50%; }
-        .spinning { animation: spin 0.6s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .app { padding: 30px 25px; max-width: 450px; margin: auto; height: 100vh; overflow-y: auto; position: relative; z-index: 60; scrollbar-width: none; transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.1, 1); }
-        .app.blur { filter: blur(35px); opacity: 0.2; transform: scale(0.94); pointer-events: none; }
-        .h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; }
-        .brand { text-align: center; width: 100%; position: absolute; left: 0; pointer-events: none; font-size: 26px; }
+        #sky-engine { position: fixed; inset: 0; z-index: -1; transition: background 2s ease; background: #000; }
+        
+        .app { padding: 30px 25px 140px; max-width: 450px; margin: auto; height: 100vh; overflow-y: auto; position: relative; z-index: 60; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .app.blur { filter: blur(40px); opacity: 0.1; transform: scale(0.92); pointer-events: none; }
+        
+        .h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; height: 50px; }
+        .brand { text-align: center; width: 100%; position: absolute; left: 0; font-size: 26px; z-index: 1; }
         .brand i { font-family: 'Dancing Script', cursive; color: #fff; font-style: normal; }
         .brand b { font-weight: 900; color: var(--p); text-transform: uppercase; font-size: 20px; vertical-align: middle; }
-        .btn { width: 50px; height: 50px; border-radius: 22px; background: var(--glass); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(30px); cursor: pointer; z-index: 10; font-size: 20px; }
+        
+        .btn { width: 50px; height: 50px; border-radius: 22px; background: var(--glass); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(30px); cursor: pointer; z-index: 70; }
+        
         .hero { text-align: center; margin: 30px 0; }
-        .city-mid { font-size: 11px; font-weight: 900; letter-spacing: 5px; color: var(--p); text-transform: uppercase; margin-bottom: 15px; display: block; }
         #temp-val { font-size: 130px; font-weight: 100; letter-spacing: -10px; line-height: 0.8; position: relative; display: inline-block; }
         #temp-val::after { content: '°'; position: absolute; top: 10px; right: -35px; font-size: 50px; color: var(--p); }
+        
         .card { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; margin-top: 20px; backdrop-filter: blur(40px); }
-        .r-day { display: grid; grid-template-columns: 1fr 40px 100px; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .r-day { display: grid; grid-template-columns: 1.2fr 1fr 1fr; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .today-tag { color: var(--p); font-size: 9px; font-weight: 900; background: rgba(255,149,0,0.1); padding: 2px 6px; border-radius: 6px; margin-left: 5px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0 30px; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
         .box { background: var(--glass); border: 1px solid var(--border); border-radius: 32px; padding: 22px; cursor: pointer; }
         .box span { font-size: 10px; font-weight: 900; color: var(--p); text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .sheet { position: fixed; bottom: -110%; left: 0; right: 0; background: rgba(8, 8, 12, 0.98); border-radius: 45px 45px 0 0; padding: 30px 25px 60px; z-index: 1000; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(80px); border-top: 1px solid var(--border); max-height: 92vh; overflow-y: auto; }
+
+        .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 50px); max-width: 400px; height: 75px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 35px; backdrop-filter: blur(60px); z-index: 100; display: flex; align-items: center; justify-content: space-around; padding: 0 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .dock-item { text-align: center; opacity: 0.5; cursor: pointer; flex: 1; transition: 0.3s; }
+        .dock-item.active { opacity: 1; color: var(--p); }
+        .dock-item i { display: block; font-size: 24px; font-style: normal; }
+        .dock-item span { font-size: 9px; font-weight: 900; text-transform: uppercase; margin-top: 2px; display: block; }
+
+        .sheet { position: fixed; bottom: -110%; left: 0; right: 0; background: rgba(5, 5, 10, 0.99); border-radius: 45px 45px 0 0; padding: 30px 25px 60px; z-index: 1000; transition: bottom 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); backdrop-filter: blur(100px); border-top: 1px solid var(--border); max-height: 94vh; overflow-y: auto; will-change: bottom; }
         .sheet.open { bottom: 0; }
-        .handle { width: 50px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: -10px auto 25px; }
-        .pill { display: flex; justify-content: space-between; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); align-items: center; cursor: pointer; }
-        .pill b { color: var(--p); }
-        .desc-text { font-size: 11px; opacity: 0.5; margin: -5px 0 20px 10px; display: block; line-height: 1.4; }
-        .chart-container { margin: 10px 0 25px; background: rgba(255,255,255,0.02); border-radius: 25px; padding: 20px; border: 1px solid var(--border); min-height: 160px; }
-        .ios-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 100px; gap: 8px; }
-        .bar { width: 100%; background: linear-gradient(to top, var(--p), #ffd700); border-radius: 10px; height: 0; transition: height 0.8s ease-out; }
-        .bar-time { font-size: 8px; opacity: 0.4; font-weight: 700; margin-top: 8px; }
-        .deep-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(40px); }
-        .deep-modal.active { display: flex; }
-        .deep-content { background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 35px; padding: 25px; width: 100%; max-width: 400px; text-align: center; }
+
+        .chart-box { display: flex; align-items: flex-end; justify-content: space-between; height: 160px; gap: 10px; margin: 25px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 30px; border: 1px solid var(--border); }
+        .bar-container { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+        .bar-fill { width: 90%; background: linear-gradient(to top, #ff9500, #ffcc00); border-radius: 12px; height: 0; transition: height 1s ease-out; box-shadow: 0 5px 15px rgba(255,149,0,0.4); border: 1.5px solid rgba(255,255,255,0.4); }
+        .bar-label { font-size: 10px; margin-top: 12px; font-weight: 900; color: #fff; }
+
+        .radar-simple { width: 140px; height: 140px; margin: 20px auto; border: 2px solid var(--p); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
+        .radar-wave { position: absolute; inset: 0; border: 1px solid var(--p); border-radius: 50%; animation: scanPulse 2s infinite ease-out; }
+        @keyframes scanPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        
+        .pill { display: flex; justify-content: space-between; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); align-items: center; }
+        
+        input { -webkit-appearance: none; border-radius: 25px; }
     </style>
 </head>
 <body>
 <div id="sky-engine"></div>
-<div id="ptr-wrap"><div id="ptr-spinner"></div></div>
-<div class="deep-modal" id="deep-modal"><div class="deep-content"><h3 id="deep-title" style="color:var(--p); margin-bottom:10px; text-transform: uppercase;"></h3><p id="deep-text" style="opacity:0.8; line-height:1.6; font-size:14px; margin-bottom:25px; white-space: pre-line;"></p><div class="pill" style="background:var(--p); color:#000; justify-content:center; font-weight:900" onclick="closeDeep()">OK 🫡</div></div></div>
+
+<div class="dock">
+    <div class="dock-item active" onclick="cs()"><i>🏠</i><span>Home</span></div>
+    <div class="dock-item" onclick="os('sh-live')"><i>🛰️</i><span>Radar</span></div>
+    <div class="dock-item" onclick="os('sh-sett')"><i>⚙️</i><span>Impostazioni</span></div>
+</div>
+
 <div class="app" id="main-app">
-    <div class="h"><div class="btn" onclick="os('sh-search')">🔍</div><div class="brand"><i>loni</i><b>meteo</b></div><div class="btn" onclick="os('sh-sett')">⚙️</div></div>
-    <div class="hero"><span class="city-mid" id="city-name">SYNC...</span><div id="temp-val">--</div><span id="last-update" style="display:block; font-size:9px; opacity:0.4; text-transform:uppercase; margin-top:10px">Sincronizzazione...</span></div>
+    <div class="h">
+        <div class="btn" onclick="os('sh-search')">🔍</div>
+        <div class="brand"><i>loni</i><b>meteo</b></div>
+        <div class="btn" onclick="refresh(curCity)">🔄</div>
+    </div>
+    
+    <div class="hero">
+        <span id="greeting" style="font-size:10px; font-weight:900; color:var(--p); letter-spacing:2px; text-transform:uppercase">In attesa...</span>
+        <div style="margin: 10px 0;"><span class="city-mid" id="city-name">TITAN QUANTUM</span></div>
+        <div id="temp-val">--</div>
+        <div id="wisdom-home" style="font-size:10px; font-weight:700; opacity:0.6; margin-top:15px; letter-spacing:1px">Sincronizzazione dati...</div>
+    </div>
+
     <div class="card"><div id="forecast-list"></div></div>
+
     <div class="grid">
-        <div class="box" onclick="sd('uv')"><span>☀️ UV Live</span><b id="uv-val">--</b></div>
-        <div class="box" onclick="sd('hum')"><span>💧 Umidità</span><b id="humi">--%</b></div>
-        <div class="box" onclick="sd('wind')"><span>💨 Vento</span><b id="wind">-- km/h</b></div>
-        <div class="box" onclick="sd('vis')"><span>👁️ Visibilità</span><b>10 km</b></div>
+        <div class="box" onclick="sd('uv')"><span>☀️ UV LIVE</span><b id="uv-val">--</b></div>
+        <div class="box" onclick="sd('hum')"><span>💧 UMIDITÀ</span><b id="humi">--%</b></div>
+        <div class="box" onclick="sd('wind')"><span>💨 VENTO</span><b id="wind">-- km/h</b></div>
+        <div class="box" onclick="sd('vis')"><span>👁️ VISIBILITÀ</span><b>10 km</b></div>
     </div>
 </div>
-<div class="overlay-bg" id="bg-f" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:900;display:none" onclick="cs()"></div>
-<div class="sheet" id="sh-info"><div class="handle" onclick="cs()"></div><h2 id="sh-t" style="text-align:center; margin-bottom:15px; color:var(--p)">--</h2><div id="sh-b"></div></div>
-<div class="sheet" id="sh-search"><div class="handle" onclick="cs()"></div><input type="text" id="city-input" style="width:100%; padding:18px; background:var(--glass); border:1px solid var(--border); border-radius:20px; color:#fff; outline:none; margin-bottom:20px" placeholder="Cerca comune..."><div id="res-city"></div></div>
-<div class="sheet" id="sh-sett"><div class="handle" onclick="cs()"></div><h2 style="text-align:center; margin-bottom:25px">Titan Center ⚙️</h2><div class="pill" onclick="openDeep('Titan v15.1','Sviluppato per la massima precisione satellitare.\\n\\nStatus: Ottimizzato ✅')"><span>Versione</span><b>15.1 FINAL</b></div><div class="pill" style="margin-top:20px; background:rgba(255,149,0,0.1);" onclick="location.reload()"><span>Reset</span><span>🔄</span></div></div>
+
+<div class="overlay-bg" id="bg-f" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:900;display:none" onclick="cs()"></div>
+
+<div class="sheet" id="sh-live">
+    <div style="width:50px; height:6px; background:rgba(255,255,255,0.2); border-radius:10px; margin:-10px auto 25px;"></div>
+    <div class="radar-simple"><div class="radar-wave"></div><i style="font-size:40px">📡</i></div>
+    <h2 style="text-align:center; color:var(--p); margin-top:20px;">RADAR ATMOSFERICO</h2>
+    <div class="pill" style="margin-top:20px"><span>Ricezione Dati</span><b>Stabile ✅</b></div>
+    <div class="pill"><span>Stato Satelliti</span><b>Agganciati</b></div>
+    <p style="font-size:11px; text-align:center; opacity:0.5; padding:10px 20px;">Scansione geostazionaria regione Puglia attiva.</p>
+</div>
+
+<div class="sheet" id="sh-info">
+    <div style="width:50px; height:6px; background:rgba(255,255,255,0.2); border-radius:10px; margin:-10px auto 25px;"></div>
+    <h2 id="sh-t" style="color:var(--p); text-align:center; text-transform:uppercase;">DETTAGLI</h2>
+    <div class="chart-box" id="cb"></div>
+    <div id="sh-wisdom-box"></div>
+</div>
+
+<div class="sheet" id="sh-search">
+    <div style="width:50px; height:6px; background:rgba(255,255,255,0.2); border-radius:10px; margin:-10px auto 25px;"></div>
+    <input type="text" id="city-input" style="width:100%; padding:20px; background:var(--glass); border:1px solid var(--border); border-radius:25px; color:#fff; outline:none; font-size:16px" placeholder="Cerca comune pugliese...">
+    <div id="res-city" style="margin-top:20px"></div>
+</div>
+
+<div class="sheet" id="sh-sett">
+    <div style="width:50px; height:6px; background:rgba(255,255,255,0.2); border-radius:10px; margin:-10px auto 25px;"></div>
+    <h2 style="text-align:center; margin-bottom:30px;">Impostazioni Titan</h2>
+    <div class="pill"><span>Versione</span><b>17.5 ANDROID</b></div>
+    <div class="pill"><span>Stato Sistema</span><b>Ottimizzato ✅</b></div>
+    <div class="pill" style="margin-top:20px; background:var(--p); color:#000;" onclick="location.reload()"><b>RIAVVIA SISTEMA</b></div>
+</div>
 
 <script>
-    let k="92861dce42dbac09fa9bae55f8f38550", d=null, curCity="Barletta", lat=41.31, lon=16.28;
+    let k="92861dce42dbac09fa9bae55f8f38550", d=null, curCity=localStorage.getItem('lastCity') || "Barletta", lat=41.31, lon=16.28;
     const puglia = ["Barletta", "Andria", "Trani", "Bari", "Foggia", "Lecce", "Taranto", "Brindisi", "Bisceglie", "Molfetta", "Cerignola"];
-    const app = document.getElementById('main-app'), wrap = document.getElementById('ptr-wrap'), spin = document.getElementById('ptr-spinner');
-    let sY = 0, pulling = false;
+    const quotes = ["Analisi Completata ✅", "Satelliti agganciati 🛰️", "Titan Engine Attivo ⚡", "Tutto sotto controllo 🦾", "Meteo di precisione 🎯"];
+    
+    const v=(ms=30)=>{ if(navigator.vibrate) navigator.vibrate(ms); };
+    const os=id=>{ v(); document.getElementById('main-app').classList.add('blur'); document.getElementById('bg-f').style.display='block'; document.getElementById(id).classList.add('open'); };
+    const cs=()=>{ document.getElementById('main-app').classList.remove('blur'); document.getElementById('bg-f').style.display='none'; document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); };
 
-    app.ontouchstart = e => { if (app.scrollTop <= 0) { sY = e.touches[0].pageY; pulling = true; } };
-    app.ontouchmove = e => {
-        if (!pulling || app.scrollTop > 0) return;
-        let diff = e.touches[0].pageY - sY;
-        if (diff > 0) { app.style.transform = `translateY(${Math.pow(diff, 0.8)}px)`; wrap.style.opacity = 1; spin.style.transform = `rotate(${diff * 3}deg)`; }
-    };
-    app.ontouchend = e => {
-        if (!pulling) return; pulling = false; app.style.transform = "translateY(0)";
-        if (e.changedTouches[0].pageY - sY > 100) { spin.classList.add('spinning'); refresh(curCity).then(() => { spin.classList.remove('spinning'); wrap.style.opacity = 0; }); } else { wrap.style.opacity = 0; }
-    };
-
-    const os=id=>{ app.classList.add('blur'); document.getElementById('bg-f').style.display='block'; document.getElementById(id).classList.add('open'); };
-    const cs=()=>{ app.classList.remove('blur'); document.getElementById('bg-f').style.display='none'; document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); };
-    const openDeep=(t, txt)=>{ document.getElementById('deep-title').innerText = t; document.getElementById('deep-text').innerText = txt; document.getElementById('deep-modal').classList.add('active'); };
-    const closeDeep=()=>document.getElementById('deep-modal').classList.remove('active');
-
-    const updateSky = (cond, sr, ss) => {
-        const now = Math.floor(Date.now() / 1000), engine = document.getElementById('sky-engine');
-        let theme = "radial-gradient(circle at 50% 0%, #1a1a3a 0%, #000 100%)";
-        if (now > sr && now < ss) theme = (cond === "Clear") ? "radial-gradient(circle at 50% 10%, #0052D4 0%, #000 100%)" : "radial-gradient(circle at 50% 10%, #485e7d 0%, #000 100%)";
-        else if (now >= ss && now < ss + 3600) theme = "radial-gradient(circle at 50% 0%, #f12711 0%, #000 100%)";
-        engine.style.background = theme;
+    const updateGreeting = () => {
+        const h = new Date().getHours();
+        let g = "Buongiorno ☕";
+        if (h >= 13 && h < 18) g = "Buon pomeriggio ☀️";
+        if (h >= 18 && h < 23) g = "Buonasera 🌙";
+        if (h >= 23 || h < 6) g = "Buonanotte 🌌";
+        document.getElementById('greeting').innerText = g;
     };
 
     const refresh=async c=>{
         try {
-            const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${c},IT&appid=${k}&units=metric&lang=it`);
-            d=await r.json(); lat=d.coord.lat; lon=d.coord.lon; curCity=c;
+            v(50);
+            const url = typeof c === 'string' ? `q=${c},IT` : `lat=${c.lat}&lon=${c.lon}`;
+            const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?${url}&appid=${k}&units=metric&lang=it`);
+            d=await r.json(); lat=d.coord.lat; lon=d.coord.lon; curCity=d.name;
+            localStorage.setItem('lastCity', curCity);
             document.getElementById('city-name').innerText=d.name.toUpperCase();
-            document.getElementById('temp-val').innerText=d.main.temp.toFixed(1);
+            document.getElementById('temp-val').innerText=Math.round(d.main.temp);
             document.getElementById('humi').innerText=d.main.humidity+'%';
             document.getElementById('wind').innerText=Math.round(d.wind.speed*3.6)+' km/h';
-            const or=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index`);
-            const od=await or.json();
+            
+            const or=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index&hourly=temperature_2m,precipitation_probability,wind_speed_10m,uv_index&forecast_days=1`);
+            const od=await or.json(); window.hourlyData = od.hourly;
             document.getElementById('uv-val').innerText=od.current.uv_index.toFixed(1);
-            document.getElementById('last-update').innerText = `Sync: ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-            updateSky(d.weather[0].main, d.sys.sunrise, d.sys.sunset);
-            renderForecast(); cs();
+            
+            const engine = document.getElementById('sky-engine');
+            const h = new Date().getHours();
+            engine.style.background = (h > 6 && h < 20) ? "radial-gradient(circle at 50% 10%, #0052D4 0%, #000 100%)" : "radial-gradient(circle at 50% 0%, #1a1a3a 0%, #000 100%)";
+            
+            updateGreeting();
+            document.getElementById('wisdom-home').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+            renderForecast(); if(document.querySelector('.sheet.open')) cs();
         } catch(e) { console.error(e); }
     };
 
@@ -117,38 +171,39 @@
         const q = e.target.value.toLowerCase(), res = document.getElementById('res-city');
         res.innerHTML = ""; if(q.length < 1) return;
         puglia.filter(x => x.toLowerCase().includes(q)).forEach(city => {
-            res.innerHTML += `<div class="pill" onclick="refresh('${city}')"><span>${city}</span><b>VAI 🚀</b></div>`;
+            res.innerHTML += `<div class="pill" onclick="refresh('${city}')"><span>${city}</span><b>SELEZIONA</b></div>`;
         });
     };
 
-    const sd=async(type, day, ico)=>{
-        const t=document.getElementById('sh-t'), b=document.getElementById('sh-b');
-        t.innerText = type==='day' ? day : type.toUpperCase();
-        b.innerHTML = `<div class="chart-container"><span id="cl" style="font-size:10px;font-weight:900;color:var(--p);opacity:0.6;display:block;margin-bottom:15px">📊 SATELLITE...</span><div class="ios-chart" id="cb"></div></div><div id="tp"></div>`;
-        os('sh-info');
-        const or=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m,uv_index&forecast_days=1`);
-        const od=await or.json(); document.getElementById('cl').innerText = `📊 ANALISI ORARIA`;
-        const hours = [8, 11, 14, 17, 20, 23], cb = document.getElementById('cb');
+    const sd=async(type, day)=>{
+        v(40); const t=document.getElementById('sh-t'), wBox=document.getElementById('sh-wisdom-box'), cb = document.getElementById('cb');
+        const labels = { uv: "INDICE UV", hum: "UMIDITÀ", wind: "VENTO", day: day };
+        t.innerText = labels[type] || day;
+        cb.innerHTML = ""; os('sh-info');
+        const hours = [8, 11, 14, 17, 20, 23];
+        const tips = {uv: "Proteggi la pelle, raggi intensi oggi. 🧴", hum: "Aria umida, occhio alla cervicale. 💧", wind: "Vento ideale per una passeggiata. 💨", day: "Titan non sbaglia mai una previsione. 🛰️"};
+        
         hours.forEach((h, i) => {
-            let v = type==='uv' ? od.hourly.uv_index[h]*10 : type==='wind' ? (od.hourly.wind_speed_10m[h]/50)*100 : od.hourly.precipitation_probability[h];
-            cb.innerHTML += `<div class="bar-wrap" style="flex:1;display:flex;flex-direction:column;align-items:center"><div class="bar" id="b-${i}"></div><span class="bar-time">${h}:00</span></div>`;
-            setTimeout(() => { if(document.getElementById(`b-${i}`)) document.getElementById(`b-${i}`).style.height = Math.max(v, 8) + '%'; }, 50 * i);
+            let val = type==='uv' ? window.hourlyData.uv_index[h]*10 : type==='wind' ? (window.hourlyData.wind_speed_10m[h]/50)*100 : window.hourlyData.precipitation_probability[h];
+            cb.innerHTML += `<div class="bar-container"><div class="bar-fill" id="b-${i}"></div><span class="bar-label">${h}:00</span></div>`;
+            setTimeout(() => { if(document.getElementById(`b-${i}`)) document.getElementById(`b-${i}`).style.height = Math.max(val, 22) + '%'; }, i * 60);
         });
-        let tips = {uv: "Mettiti la crema o diventi un peperone! 🧴", hum: "Umidità a palla. Capelli ingestibili in 3, 2, 1... 🧖‍♂️", wind: "Vento forte: ottimo per gli aquiloni, pessimo per i parrucchini! 🪁", day: "Se piove, non prendertela con me! ☔"};
-        let val = type==='uv' ? od.current.uv_index.toFixed(1) : type==='hum' ? d.main.humidity+'%' : type==='wind' ? Math.round(d.wind.speed*3.6)+' km/h' : ico;
-        document.getElementById('tp').innerHTML = `<div class="pill" onclick="openDeep('Titan Tip','${tips[type] || tips.day}')"><span>Dettaglio</span><b>${val}</b></div><span class="desc-text">Dati reali sincronizzati via satellite.</span>`;
+        wBox.innerHTML = `<div class="pill" style="margin-top:20px"><span>Titan Wisdom</span><b>${tips[type] || tips.day}</b></div>`;
     };
 
     const renderForecast=()=>{
-        const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"], icons = ["☀️", "🌤️", "🌧️", "⛅", "☀️", "🌧️", "🌤️"];
-        const curIdx = new Date().getDay(); let html = "";
+        const days = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+        const icons = ["☀️", "🌤️", "🌧️", "⛅", "☀️", "🌧️", "🌤️"];
+        const now = new Date(); let html = "";
         for(let i=0; i<7; i++){
-            let idx = (curIdx + i) % 7;
-            html += `<div class="r-day" onclick="sd('day', '${days[idx]}', '${icons[idx]}')"><b>${days[idx].slice(0,3)}${i===0?'<span class="today-tag">OGGI</span>':''}</b><div style="font-size:20px;text-align:center">${icons[idx]}</div><div style="text-align:right"><b>${Math.round(d.main.temp + i)}°</b></div></div>`;
+            let d_future = new Date(); d_future.setDate(now.getDate() + i);
+            let d_idx = d_future.getDay();
+            html += `<div class="r-day" onclick="sd('day', '${days[d_idx]}')"><b>${days[d_idx].toUpperCase()}${i===0?'<span class="today-tag">OGGI</span>':''}</b><div style="font-size:22px;text-align:center">${icons[d_idx]}</div><div style="text-align:right; font-weight:900;">${Math.round(d.main.temp + i)}°</div></div>`;
         }
         document.getElementById('forecast-list').innerHTML = html;
     };
-    refresh("Barletta");
+
+    refresh(curCity);
 </script>
 </body>
 </html>
