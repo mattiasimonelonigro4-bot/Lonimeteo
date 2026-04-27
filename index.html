@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Meteo OS - Dati Reali</title>
+    <title>Meteo OS - Reale 5D</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -27,7 +27,6 @@
         @keyframes fall { from { transform: translateY(-30px); } to { transform: translateY(105vh); } }
 
         .glass { background: var(--glass); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--border); border-radius: 32px; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .glass:active { transform: scale(0.95); }
         
         .main-content { margin-top: 140px; position: relative; z-index: 10; padding-bottom: 50px; animation: fadeIn 0.8s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -51,7 +50,6 @@
         }
         
         .forecast-row { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 14px 0; animation: slideIn 0.5s ease-out both; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
@@ -64,11 +62,11 @@
     <div class="p-6 max-w-md mx-auto main-content">
         <header class="flex justify-between items-start mb-10">
             <div>
-                <h1 id="city-name" class="text-5xl font-black tracking-tighter uppercase leading-none mb-2">Caricamento...</h1>
+                <h1 id="city-name" class="text-5xl font-black tracking-tighter uppercase leading-none mb-2">Localizzazione...</h1>
                 <p id="date-display" class="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] mb-4"></p>
                 <div class="flex items-center gap-2">
                     <span class="bg-emerald-500 w-1.5 h-1.5 rounded-full shadow-[0_0_8px_#10b981]"></span>
-                    <p id="pc-text" class="text-[9px] font-black uppercase opacity-50 tracking-widest">Dati Reali Attivi</p>
+                    <p id="pc-text" class="text-[9px] font-black uppercase opacity-50 tracking-widest">Dati 5 Giorni Reali</p>
                 </div>
             </div>
             <button onclick="toggleSearch()" class="glass w-14 h-14 flex items-center justify-center">
@@ -86,19 +84,19 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Vento', 'Velocità reale: --. Rilevazione anemometrica istantanea.');">
+            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Vento', 'Velocità: --. Analisi flussi.');">
                 <i class="fas fa-wind opacity-20 text-lg"></i>
                 <div><span id="val-wind" class="text-2xl font-bold block">--</span><span class="text-[9px] uppercase font-black opacity-30 tracking-widest">Vento</span></div>
             </div>
-            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Umidità', 'Tasso igrometrico: --. Analisi vapore acqueo nell\'aria.');">
+            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Umidità', 'Tasso: --. Analisi vapore.');">
                 <i class="fas fa-droplet text-sky-400/40 text-lg"></i>
                 <div><span id="val-hum" class="text-2xl font-bold block">--%</span><span class="text-[9px] uppercase font-black opacity-30 tracking-widest">Umidità</span></div>
             </div>
-            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Visibilità', 'Portata ottica: --. Misurazione trasparenza atmosferica.');">
+            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Visibilità', 'Portata: --. Analisi ottica.');">
                 <i class="fas fa-eye text-emerald-400/40 text-lg"></i>
                 <div><span id="val-vis" class="text-2xl font-bold block">-- km</span><span class="text-[9px] uppercase font-black opacity-30 tracking-widest">Visibilità</span></div>
             </div>
-            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Percepita', 'Indice di calore: --. Sensazione termica basata su umidità.');">
+            <div class="glass p-6 flex flex-col justify-between h-36" onclick="openSub('Percepita', 'Indice: --. Sensazione reale.');">
                 <i class="fas fa-temperature-half text-rose-400/40 text-lg"></i>
                 <div><span id="val-feel" class="text-2xl font-bold block">--°</span><span class="text-[9px] uppercase font-black opacity-30 tracking-widest">Percepita</span></div>
             </div>
@@ -126,21 +124,25 @@
         let currentCity = 'Barletta,IT';
         let globalData = null;
 
-        async function sync() {
+        async function sync(lat = null, lon = null) {
             try {
-                // Fetch Meteo Corrente
-                const resWeather = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(currentCity)}&units=metric&lang=it&appid=${API_KEY}`);
-                globalData = await resWeather.json();
+                let urlWeather = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(currentCity)}&units=metric&lang=it&appid=${API_KEY}`;
+                let urlForecast = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(currentCity)}&units=metric&lang=it&appid=${API_KEY}`;
                 
-                // Fetch Previsioni (Endpoint Forecast)
-                const resForecast = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(currentCity)}&units=metric&lang=it&appid=${API_KEY}`);
-                const forecastData = await resForecast.json();
+                if(lat && lon) {
+                    urlWeather = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=it&appid=${API_KEY}`;
+                    urlForecast = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&lang=it&appid=${API_KEY}`;
+                }
 
-                if(!resWeather.ok || !resForecast.ok) throw new Error();
+                const [resW, resF] = await Promise.all([fetch(urlWeather), fetch(urlForecast)]);
+                globalData = await resW.json();
+                const forecastData = await resF.json();
+
+                if(!resW.ok || !resF.ok) throw new Error();
 
                 updateUI(globalData);
                 renderForecastReal(forecastData.list);
-            } catch (e) { document.getElementById('city-name').innerText = "Errore Rete"; }
+            } catch (e) { document.getElementById('city-name').innerText = "Errore Dati"; }
         }
 
         function updateUI(d) {
@@ -152,7 +154,6 @@
             document.getElementById('val-vis').innerText = (d.visibility / 1000).toFixed(1);
             document.getElementById('val-feel').innerText = Math.round(d.main.feels_like);
             document.getElementById('date-display').innerText = new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'short'});
-            
             updateSkyTheme(d);
             updateCelestial();
             renderSkyEffects(d.weather[0].main);
@@ -161,40 +162,35 @@
         function renderForecastReal(list) {
             const container = document.getElementById('forecast-list');
             container.innerHTML = '';
-            
-            // Filtro: prendo solo una rilevazione al giorno (quella vicina a mezzogiorno)
-            const dailyData = list.filter(item => item.dt_txt.includes("12:00:00"));
+            const dailyData = list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
 
             dailyData.forEach((day, index) => {
                 const date = new Date(day.dt * 1000);
                 const dayName = date.toLocaleDateString('it-IT', {weekday: 'short'});
-                const iconClass = getIcon(day.weather[0].main);
-                
                 const div = document.createElement('div');
                 div.className = "forecast-row flex items-center justify-between";
                 div.style.animationDelay = `${index * 0.1}s`;
                 div.innerHTML = `
                     <span class="font-black opacity-30 text-[10px] uppercase w-12">${dayName}</span>
-                    <i class="fas ${iconClass} text-xs ${day.weather[0].main.includes('Rain') ? 'text-sky-400' : 'text-amber-400'}"></i>
+                    <i class="fas ${getIcon(day.weather[0].main)} text-xs ${day.weather[0].main.includes('Rain') ? 'text-sky-400' : 'text-amber-400'}"></i>
                     <span class="font-bold text-sm tracking-tighter">${Math.round(day.main.temp)}° <span class="opacity-20 ml-2 font-medium">${Math.round(day.main.feels_like)}°</span></span>
                 `;
                 container.appendChild(div);
             });
         }
 
-        function getIcon(condition) {
-            if(condition.includes('Rain')) return 'fa-cloud-showers-heavy';
-            if(condition.includes('Cloud')) return 'fa-cloud';
-            if(condition.includes('Clear')) return 'fa-sun';
+        function getIcon(cond) {
+            if(cond.includes('Rain')) return 'fa-cloud-showers-heavy';
+            if(cond.includes('Cloud')) return 'fa-cloud';
+            if(cond.includes('Clear')) return 'fa-sun';
             return 'fa-smog';
         }
 
         function updateSkyTheme(d) {
             const h = new Date().getHours();
-            const isNight = h < 6 || h >= 20;
             const sky = document.getElementById('sky');
             if (d.weather[0].main.includes('Rain')) sky.className = 'rainy-bg';
-            else if (isNight) sky.className = 'night';
+            else if (h < 6 || h >= 20) sky.className = 'night';
             else sky.className = d.main.temp > 28 ? 'hot' : 'day';
         }
 
@@ -210,10 +206,9 @@
         }
 
         function renderSkyEffects(cond) {
-            const isNight = new Date().getHours() < 6 || new Date().getHours() >= 20;
             document.getElementById('star-field').innerHTML = ''; 
             document.getElementById('rain-field').innerHTML = '';
-            if(isNight && !cond.toLowerCase().includes('rain')) {
+            if((new Date().getHours() < 6 || new Date().getHours() >= 20) && !cond.toLowerCase().includes('rain')) {
                 for(let i=0; i<40; i++) {
                     const s = document.createElement('div'); s.className = 'star';
                     s.style.width = s.style.height = Math.random()*1.5+1+'px';
@@ -236,21 +231,19 @@
             const extra = document.getElementById('sub-extra');
             document.getElementById('sub-title').innerText = title; 
             let val = "--", extraHtml = "";
-
             if(title === 'Vento') {
                 val = Math.round(globalData.wind.speed * 3.6) + ' km/h';
                 extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Gradi</span><span class="font-bold text-sky-400">${globalData.wind.deg}°</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Raffica</span><span class="font-bold">${Math.round((globalData.wind.gust || 0)*3.6)} km/h</span></div>`;
             } else if(title === 'Umidità') {
                 val = globalData.main.humidity + '%';
-                extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Pressione</span><span class="font-bold text-emerald-400">${globalData.main.pressure} hPa</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Punto Rugiada</span><span class="font-bold">${Math.round(globalData.main.temp - 3)}°</span></div>`;
+                extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Pressione</span><span class="font-bold text-emerald-400">${globalData.main.pressure} hPa</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Rugiada</span><span class="font-bold">${Math.round(globalData.main.temp - 3)}°</span></div>`;
             } else if(title === 'Visibilità') {
                 val = (globalData.visibility / 1000).toFixed(1) + ' km';
-                extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Nuvole</span><span class="font-bold text-amber-500">${globalData.clouds.all}%</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Qualità Aria</span><span class="font-bold text-emerald-300">Buona</span></div>`;
+                extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Nuvole</span><span class="font-bold text-amber-500">${globalData.clouds.all}%</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Qualità</span><span class="font-bold text-emerald-300">Buona</span></div>`;
             } else {
                 val = Math.round(globalData.main.feels_like) + '°';
-                extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">T. Max</span><span class="font-bold text-rose-500">${Math.round(globalData.main.temp_max)}°</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">T. Min</span><span class="font-bold text-sky-400">${Math.round(globalData.main.temp_min)}°</span></div>`;
+                extraHtml = `<div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Max</span><span class="font-bold text-rose-500">${Math.round(globalData.main.temp_max)}°</span></div><div class="glass p-4 text-center border-white/5"><span class="text-[9px] block opacity-40 uppercase mb-1">Min</span><span class="font-bold text-sky-400">${Math.round(globalData.main.temp_min)}°</span></div>`;
             }
-
             document.getElementById('sub-desc').innerText = desc.replace('--', val);
             extra.innerHTML = extraHtml;
             const iconBox = document.getElementById('sub-icon-box');
@@ -259,10 +252,16 @@
         }
 
         function closeSub() { document.getElementById('details-panel').classList.remove('active'); }
-        function toggleSearch() { document.getElementById('search-box').classList.toggle('hidden'); if(!document.getElementById('search-box').classList.contains('hidden')) document.getElementById('city-input').focus(); }
+        function toggleSearch() { document.getElementById('search-box').classList.toggle('hidden'); }
         function searchCity() { const i = document.getElementById('city-input'); if(i.value) { currentCity = i.value; sync(); toggleSearch(); i.value=''; } }
 
-        sync(); setInterval(sync, 900000); setInterval(updateCelestial, 30000);
+        // Avvio con geolocalizzazione
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(p => sync(p.coords.latitude, p.coords.longitude), () => sync());
+        } else { sync(); }
+        
+        setInterval(() => sync(), 900000);
+        setInterval(updateCelestial, 30000);
     </script>
 </body>
 </html>
