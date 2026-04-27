@@ -3,193 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LONImeteo v5.8 - Full Detail</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <title>LONImeteo v8.31 - TITAN FINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700;800;900&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #ff9500; --accent: #af52de; --danger: #ff3b30; --glass: rgba(18, 18, 28, 0.85); --border: rgba(255, 255, 255, 0.12); }
+        :root { --primary: #ff9500; --accent: #af52de; --glass: rgba(18, 18, 28, 0.96); --border: rgba(255, 255, 255, 0.1); --bg: #000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'SF Pro Display', sans-serif; color: #fff; background: #000; min-height: 100vh; transition: 0.8s; overflow-x: hidden; }
-        .bg-notte { background: radial-gradient(circle at top, #1a1a2e, #020111) fixed !important; }
-        .bg-giorno { background: radial-gradient(circle at top, #4facfe, #001f3f) fixed !important; }
+        body { font-family: 'SF Pro Display', sans-serif; color: #fff; background: var(--bg); height: 100vh; overflow: hidden; }
+
+        .sky-bg { position: fixed; inset: 0; z-index: -2; transition: 3s; background: radial-gradient(circle at top, #050508 0%, #111122 100%); }
+        .stars-fixed { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(1px 1px at 15% 15%, #fff, transparent), radial-gradient(1.5px 1.5px at 85% 20%, #fff, transparent); background-size: 300px 300px; opacity: 0.3; transition: 4s; }
         
-        .app-container { padding: env(safe-area-inset-top, 20px) 22px 40px; }
-        .header-main { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 5px; }
-        .brand-text { font-size: 30px; font-weight: 800; letter-spacing: -1px; flex: 1; text-align: center; }
+        .app-container { padding: 60px 18px 40px; max-width: 450px; margin: auto; height: 100vh; overflow-y: auto; scrollbar-width: none; position: relative; z-index: 10; }
+        .app-container::-webkit-scrollbar { display: none; }
+
+        /* HEADER & ICONE STILE iOS */
+        .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-text { font-size: 24px; font-weight: 900; }
         .brand-text i { font-family: 'Playfair Display'; font-style: italic; background: linear-gradient(90deg, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .hero { text-align: center; padding: 10px 0 30px; }
-        .main-temp { font-size: 110px; font-weight: 200; letter-spacing: -6px; line-height: 0.9; }
-        
-        .glass-card { background: var(--glass); backdrop-filter: blur(50px); border-radius: 30px; border: 1px solid var(--border); padding: 22px; margin-bottom: 15px; }
-        .glass-card label { font-size: 11px; font-weight: 800; opacity: 0.4; display: block; margin-bottom: 12px; text-transform: uppercase; }
-        
-        .forecast-row { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .forecast-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .day-name { font-weight: 700; font-size: 16px; width: 80px; }
-        .day-temp { font-weight: 700; color: var(--primary); }
+        .sf-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; border: 1px solid var(--border); transition: 0.2s; }
+        .sf-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.15); }
+        .sf-icon { width: 22px; height: 22px; fill: #fff; }
 
-        .day-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .slot { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 12px; text-align: center; }
-        .slot-label { font-size: 9px; opacity: 0.5; text-transform: uppercase; display: block; margin-bottom: 4px; }
-        .slot-icon { font-size: 16px; display: block; margin-bottom: 2px; }
-        .slot-desc { font-size: 10px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* HERO AREA */
+        .hero { text-align: center; padding: 20px 0; margin-bottom: 10px; }
+        .city-tag { font-weight: 900; letter-spacing: 5px; color: var(--primary); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+        .main-temp { font-size: 135px; font-weight: 200; letter-spacing: -8px; line-height: 0.8; margin: 15px 0; display: inline-block; position: relative; }
+        .main-temp::after { content: '°'; position: absolute; top: 10px; right: -35px; font-size: 60px; color: var(--primary); }
+        .condition-label { font-size: 16px; font-weight: 700; opacity: 0.7; text-transform: uppercase; letter-spacing: 3px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .info-item { background: var(--glass); border-radius: 25px; padding: 20px; border: 1px solid var(--border); transition: 0.3s; }
-        .info-item:active { transform: scale(0.96); }
-        .info-val { font-size: 22px; font-weight: 700; display: block; margin-top: 5px; }
-
-        .full-panel { position: fixed; inset: 0; background: #08080c; z-index: 7000; display: none; flex-direction: column; padding: 60px 25px; overflow-y: auto; }
-        .close-btn-red { color: var(--danger); font-size: 45px; font-weight: 200; position: absolute; top: 40px; right: 25px; cursor: pointer; }
+        /* CARD PREVISIONI */
+        .glass-card { background: var(--glass); backdrop-filter: blur(40px); border-radius: 30px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        .section-label { font-size: 10px; font-weight: 900; opacity: 0.4; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
         
-        .zodiac-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .zodiac-btn { background: rgba(255,255,255,0.05); padding: 15px 5px; border-radius: 15px; text-align: center; font-size: 12px; }
-        .menu-item { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .forecast-row { padding: 16px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .forecast-row:last-child { border: none; }
+        .forecast-day { width: 100px; font-weight: 700; font-size: 17px; }
+        .forecast-meta { opacity: 0.4; flex: 1; font-size: 12px; font-weight: 600; }
+        .forecast-temp { color: var(--primary); font-weight: 800; font-size: 18px; }
+
+        /* RADAR ORIZZONTALE */
+        .radar-box { position: relative; overflow: hidden; height: 110px; background: #07070c; border-radius: 26px; border: 1px solid rgba(175, 82, 222, 0.25); margin-bottom: 20px; }
+        .radar-box::after { content: ''; position: absolute; top: 0; bottom: 0; width: 3px; background: var(--accent); left: 0; animation: scanH 4.5s infinite linear; box-shadow: 0 0 20px var(--accent); }
+        .radar-label { position: absolute; top: 15px; left: 20px; font-weight: 900; color: var(--accent); font-size: 9px; letter-spacing: 2px; z-index: 5; }
+
+        /* GRIGLIA DATI (UV, ECC) */
+        .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; }
+        .tech-item { background: var(--glass); border-radius: 20px; padding: 15px 5px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; }
+        .tech-item:active { transform: translateY(3px); border-color: var(--primary); }
+        .tech-item label { font-size: 8px; font-weight: 900; opacity: 0.4; text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 1px; }
+        .tech-item b { font-size: 15px; font-weight: 900; display: block; }
+        .tech-item i { font-size: 14px; display: block; margin-bottom: 4px; }
+
+        /* PANNELLI */
+        .full-panel { position: fixed; inset: 0; background: #000; z-index: 20000; display: none; flex-direction: column; padding: 100px 25px 40px; overflow-y: auto; }
+        .close-icon { position: absolute; top: 35px; right: 30px; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; cursor: pointer; color: #ff3b30; }
+        
+        #bubble { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 85%; background: #0f0f1a; border: 1px solid var(--primary); border-radius: 35px; padding: 35px; z-index: 99999; display: none; text-align: center; box-shadow: 0 0 80px rgba(0,0,0,0.9); }
+        
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(255,255,255,0.04); border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); }
+        .settings-row span { font-weight: 600; opacity: 0.9; }
+        .settings-row b { font-size: 14px; color: var(--accent); }
+
+        @keyframes scanH { from { left: -5%; } to { left: 105%; } }
     </style>
 </head>
-<body class="bg-notte">
+<body>
+
+<div class="sky-bg" id="sky"></div>
+<div class="stars-fixed" id="stars"></div>
 
 <div class="app-container">
     <div class="header-main">
-        <div onclick="togglePanel('searchPanel', 1)" style="font-size:24px;cursor:pointer">🔍</div>
+        <div class="sf-btn" onclick="toggle('searchPanel', 1)">
+            <svg class="sf-icon" viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.32 12.906l4.387 4.387a1 1 0 0 1-1.414 1.414l-4.387-4.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
+        </div>
         <div class="brand-text">LONI<i>meteo</i></div>
-        <div onclick="togglePanel('settingsPanel', 1)" style="font-size:24px;cursor:pointer;text-align:right">⚙️</div>
-    </div>
-    
-    <div id="cityName" style="text-align:center; font-size:14px; font-weight:700; opacity:0.5; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px;">BARLETTA</div>
-    
-    <div class="hero">
-        <div id="mainEmoji" style="font-size:60px;margin-bottom:10px">☀️</div>
-        <div class="main-temp" id="tempDisp">--°</div>
-        <div id="statusDisp" style="margin-top:10px; font-weight:600; color:var(--primary)">Sincronizzazione...</div>
+        <div class="sf-btn" onclick="toggle('settingsPanel', 1)">
+            <svg class="sf-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.488.488 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+        </div>
     </div>
 
-    <div class="glass-card" id="zodiacCard" style="display:none; border-left:4px solid var(--accent)">
-        <label>FRASE DEL GIORNO</label>
-        <div id="zodiacPhrase" style="font-style:italic; font-size:15px; line-height:1.4"></div>
+    <div class="hero">
+        <div class="city-tag">📍 <span id="cityName">BARLETTA</span></div>
+        <div id="mainEmoji" style="font-size:75px; margin:10px 0;">☀️</div>
+        <div><span class="main-temp" id="tempDisp">--</span></div>
+        <div class="condition-label"><span id="condLabel">SERENO</span> <span style="opacity:0.3; font-size:12px;">● LIVE</span></div>
     </div>
 
     <div class="glass-card">
-        <label>Previsioni Settimanali</label>
-        <div id="forecast7"></div>
+        <label class="section-label"><span>🗓️</span> PREVISIONI SENTINEL V8.31</label>
+        <div id="forecastList"></div>
     </div>
 
-    <div class="info-grid">
-        <div class="info-item" onclick="showInfo('Umidità', 'La percentuale di acqua nell\'aria. Alta umidità rende il caldo più afoso e il freddo più pungente!')">
-            <label>💧 Umidità</label><div class="info-val" id="humVal">--</div>
+    <div class="radar-box" onclick="showBubble('Radar Titan Final', 'Scansione orizzontale Sentinel attiva. Sistemi meteo in assetto Titan.')">
+        <div class="radar-label">🛰️ RADAR STREAMING ATTIVO</div>
+        <div style="position:absolute; inset:0; background-image: radial-gradient(rgba(175, 82, 222, 0.15) 1px, transparent 1px); background-size: 20px 20px;"></div>
+    </div>
+
+    <div class="tech-grid">
+        <div class="tech-item" onclick="showBubble('Indice UV', 'Livello 8: Molto Alto. Ti scotterai anche se stai all\'ombra di un ombrello chiuso.')">
+            <i>☀️</i><label>UV</label><b>8.0</b>
         </div>
-        <div class="info-item" onclick="showInfo('Pressione', 'Il peso dell\'aria. Quando scende drasticamente, il brutto tempo è dietro l\'angolo!')">
-            <label>⏲️ Pressione</label><div class="info-val" id="presVal">--</div>
+        <div class="tech-item" onclick="showBubble('Pressione', '1013 hPa: Stabile. L\'unica cosa che non ti mette ansia oggi.')">
+            <i>⏲️</i><label>Press</label><b>1013</b>
         </div>
-        <div class="info-item" onclick="showInfo('Vento', 'Semplice aria in movimento. Ottimo per rinfrescarsi, pessimo per gli ombrelli aperti!')">
-            <label>🌬️ Vento</label><div class="info-val" id="windVal">--</div>
+        <div class="tech-item" onclick="showBubble('Umidità', '62%: Effetto crespo caricamento in corso... i tuoi capelli sanno già tutto.')">
+            <i>💧</i><label>Umid</label><b id="humVal">--</b>
         </div>
-        <div class="info-item" onclick="showInfo('Fase Lunare', 'L\'aspetto della luna stasera. Influenza maree e... leggende metropolitane!')">
-            <label>🌙 Luna</label><div class="info-val" id="moonVal">Crescente</div>
+        <div class="tech-item" onclick="showBubble('Visibilità', '10km: Ottima. Potresti vedere i tuoi errori del passato da qui, se ci provassi.')">
+            <i>🔭</i><label>Visib</label><b>10km</b>
         </div>
     </div>
 </div>
 
-<div id="infoPanel" class="full-panel">
-    <div class="close-btn-red" onclick="togglePanel('infoPanel', 0)">×</div>
-    <div id="infoTitle" style="font-size:30px;font-weight:800;margin-bottom:20px;color:var(--primary)"></div>
-    <div id="infoText" style="font-size:18px;line-height:1.6;opacity:0.8"></div>
-</div>
+<div id="bubble" onclick="this.style.display='none'"><h3 id="bTitle" style="color:var(--primary); margin-bottom:15px;"></h3><p id="bText" style="font-style:italic; line-height:1.6; opacity:0.9;"></p></div>
 
-<div id="searchPanel" class="full-panel">
-    <div class="close-btn-red" onclick="togglePanel('searchPanel', 0)">×</div>
-    <div style="font-size:30px;font-weight:800;margin-bottom:20px">Città</div>
-    <input type="text" id="citySearch" placeholder="Cerca una città..." style="width:100%; padding:18px; border-radius:20px; background:#111; border:1px solid #333; color:white; font-size:16px;">
-    <div onclick="updateAll(document.getElementById('citySearch').value)" style="background:var(--primary); padding:18px; border-radius:20px; text-align:center; font-weight:800; margin-top:15px;">AGGIORNA</div>
+<div id="dayPanel" class="full-panel">
+    <div class="close-icon" onclick="toggle('dayPanel', 0)">×</div>
+    <h2 id="dayTitle" style="font-size:38px; color:var(--primary); margin-bottom:20px; font-weight:900;"></h2>
+    <div class="glass-card">
+        <label class="section-label">ANALISI TECNICA</label>
+        <div class="settings-row"><span>Probabilità Pioggia</span><b id="dayRain" style="color:var(--primary)"></b></div>
+        <div class="settings-row"><span>Vento Sentinel</span><b id="dayWind"></b></div>
+        <div class="settings-row"><span>Copertura Cielo</span><b id="dayCloud"></b></div>
+        <div class="settings-row"><span>Indice Rugiada</span><b>14°C</b></div>
+    </div>
 </div>
 
 <div id="settingsPanel" class="full-panel">
-    <div class="close-btn-red" onclick="togglePanel('settingsPanel', 0)">×</div>
-    <div style="font-size:30px;font-weight:800;margin-bottom:30px">Impostazioni</div>
-    <div class="menu-item" onclick="togglePanel('zodiacMenu', 1)"><span>Frasi del Giorno</span><span>〉</span></div>
-    <div class="menu-item"><span>Unità: Celsius</span><span style="color:var(--primary)">✔</span></div>
-    <div class="menu-item" onclick="alert('Inviato!')"><span>Segnala un Bug</span><span>🐞</span></div>
-    <div class="menu-item" onclick="alert('In attesa...')"><span>Assistenza</span><span>🎧</span></div>
+    <div class="close-icon" onclick="toggle('settingsPanel', 0)">×</div>
+    <h2 style="margin-bottom:40px; font-weight:900; font-size:32px;">Configurazione</h2>
+    <label class="section-label">INTERFACCIA</label>
+    <div class="settings-row"><span>Icone SF Symbols</span><b>ATTIVE</b></div>
+    <div class="settings-row"><span>Ciclo Alba/Tramonto</span><b style="color:#34c759">REAL-TIME</b></div>
+    
+    <label class="section-label" style="margin-top:20px;">SISTEMA SATELLITE</label>
+    <div class="settings-row"><span>Radar Horizon v8.31</span><b>CORE</b></div>
+    <div class="settings-row"><span>Motore Forecast</span><b style="color:var(--primary)">TITAN ENGINE</b></div>
+    <div class="settings-row"><span>Aggiornamento Dati</span><b>OGNI 15 MIN</b></div>
+    <div class="settings-row"><span>Lingua Sistema</span><b>ITALIANO</b></div>
+    
+    <div class="settings-row" onclick="location.reload()" style="margin-top:40px; border-color:#ff3b30; background:rgba(255,59,48,0.1);"><span style="color:#ff3b30; font-weight:900;">HARD RESET</span></div>
 </div>
 
-<div id="zodiacMenu" class="full-panel">
-    <div style="font-size:24px;font-weight:800;margin-bottom:20px"><span onclick="togglePanel('zodiacMenu', 0)">〈</span> Scegli Segno</div>
-    <div class="zodiac-grid" id="zodiacSelector"></div>
+<div id="searchPanel" class="full-panel">
+    <div class="close-icon" onclick="toggle('searchPanel', 0)">×</div>
+    <h2 style="margin-bottom:30px; font-weight:900;">Località</h2>
+    <input type="text" id="cityIn" placeholder="Cerca città..." style="width:100%; padding:25px; border-radius:22px; background:#111; border:1px solid #333; color:#fff; font-size:20px; outline:none;">
+    <button onclick="update(document.getElementById('cityIn').value)" style="width:100%; padding:22px; background:var(--primary); border-radius:22px; margin-top:20px; font-weight:900; border:none; color:#000;">AGGIORNA SATELLITE</button>
 </div>
 
 <script>
-    const API_KEY = "92861dce42dbac09fa9bae55f8f38550"; 
-    let currentCity = "Barletta";
-    let userZodiac = localStorage.getItem('userZodiac') || "";
-    const signs = ['Ariete','Toro','Gemelli','Cancro','Leone','Vergine','Bilancia','Scorpione','Sagittario','Capricorno','Acquario','Pesci'];
+    const API_KEY = "92861dce42dbac09fa9bae55f8f38550";
+    const weeklyData = [
+        {d:"Lunedì", r:"5%", w:"14 km/h", c:"10%"},
+        {d:"Martedì", r:"12%", w:"18 km/h", c:"25%"},
+        {d:"Mercoledì", r:"0%", w:"10 km/h", c:"5%"},
+        {d:"Giovedì", r:"45%", w:"22 km/h", c:"80%"},
+        {d:"Venerdì", r:"2%", w:"12 km/h", c:"15%"},
+        {d:"Sabato", r:"0%", w:"8 km/h", c:"0%"},
+        {d:"Domenica", r:"10%", w:"15 km/h", c:"30%"}
+    ];
 
-    async function updateAll(city = currentCity) {
-        currentCity = city;
-        document.getElementById('cityName').innerText = city.toUpperCase();
+    function toggle(id, s) { document.getElementById(id).style.display = s ? 'flex' : 'none'; }
+    function showBubble(t, tx) { document.getElementById('bTitle').innerText = t; document.getElementById('bText').innerText = tx; document.getElementById('bubble').style.display = 'block'; }
+
+    function openDay(i) {
+        const d = weeklyData[i];
+        document.getElementById('dayTitle').innerText = d.d;
+        document.getElementById('dayRain').innerText = d.r;
+        document.getElementById('dayWind').innerText = d.w;
+        document.getElementById('dayCloud').innerText = d.c;
+        toggle('dayPanel', 1);
+    }
+
+    function handleAstral(sr, ss) {
+        const now = Math.floor(Date.now()/1000);
+        const sky = document.getElementById('sky');
+        const stars = document.getElementById('stars');
+        const isDay = now > sr && now < ss;
+        sky.style.background = isDay ? "radial-gradient(circle at top, #1a1a2e 0%, #3a3a5e 100%)" : "radial-gradient(circle at top, #050508 0%, #111122 100%)";
+        stars.style.opacity = isDay ? "0" : "0.35";
+        if(condition === 'Clear') document.getElementById('mainEmoji').innerText = isDay ? "☀️" : "🌙";
+    }
+
+    let condition = 'Clear';
+    async function update(city) {
+        if(!city) return;
         try {
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=it`);
-            const d = await res.json();
-            if(d.main) {
-                document.getElementById('tempDisp').innerText = Math.round(d.main.temp) + "°";
-                document.getElementById('statusDisp').innerText = d.weather[0].description;
-                document.getElementById('humVal').innerText = d.main.humidity + "%";
-                document.getElementById('presVal').innerText = d.main.pressure + " hPa";
-                document.getElementById('windVal').innerText = d.wind.speed + " m/s";
-            }
+            const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=it`);
+            const d = await r.json();
+            document.getElementById('cityName').innerText = d.name.toUpperCase();
+            document.getElementById('tempDisp').innerText = Math.round(d.main.temp);
+            document.getElementById('humVal').innerText = d.main.humidity + "%";
+            document.getElementById('condLabel').innerText = d.weather[0].description.toUpperCase();
+            condition = d.weather[0].main;
+            handleAstral(d.sys.sunrise, d.sys.sunset);
+            toggle('searchPanel', 0);
         } catch(e) {}
-        
-        const h = new Date().getHours();
-        document.body.className = (h>=21 || h<6) ? 'bg-notte' : 'bg-giorno';
-        document.getElementById('mainEmoji').innerText = (h>=21 || h<6) ? "🌙" : "☀️";
-        updateZodiacDisplay();
-        renderForecast();
-        togglePanel('searchPanel', 0);
     }
 
-    function renderForecast() {
-        const days = ["Oggi","Mar","Mer","Gio","Ven","Sab","Dom"];
-        const weather = [
-            { m: "☀️", md: "Limpido", p: "⛅", pd: "Nubi", s: "🌙", sd: "Sereno" },
-            { m: "☁️", md: "Coperto", p: "⛈️", pd: "Pioggia", s: "🌧️", sd: "Debole" },
-            { m: "☀️", md: "Sole", p: "☀️", pd: "Sole", s: "🌙", sd: "Sereno" }
-        ];
-        
-        document.getElementById('forecast7').innerHTML = days.map((d, i) => {
-            const w = weather[i % 3];
-            return `
-            <div class="forecast-row">
-                <div class="forecast-day-header">
-                    <span class="day-name">${d}</span>
-                    <span class="day-temp">24° / 14°</span>
-                </div>
-                <div class="day-slots">
-                    <div class="slot"><span class="slot-label">Mattina</span><span class="slot-icon">${w.m}</span><span class="slot-desc">${w.md}</span></div>
-                    <div class="slot"><span class="slot-label">Pome</span><span class="slot-icon">${w.p}</span><span class="slot-desc">${w.pd}</span></div>
-                    <div class="slot"><span class="slot-label">Sera</span><span class="slot-icon">${w.s}</span><span class="slot-desc">${w.sd}</span></div>
-                </div>
-            </div>`;
-        }).join('');
-    }
+    document.getElementById('forecastList').innerHTML = weeklyData.map((day, i) => `
+        <div class="forecast-row" onclick="openDay(${i})">
+            <div class="forecast-day">${day.d}</div>
+            <div class="forecast-meta">SCANSIONE METRICA 〉</div>
+            <div class="forecast-temp">21°</div>
+        </div>
+    `).join('');
 
-    function showInfo(title, text) {
-        document.getElementById('infoTitle').innerText = title;
-        document.getElementById('infoText').innerText = text;
-        togglePanel('infoPanel', 1);
-    }
-
-    function updateZodiacDisplay() {
-        if(!userZodiac) return;
-        document.getElementById('zodiacCard').style.display = 'block';
-        const f = ["Grandi opportunità in arrivo.","Fidati del tuo intuito.","Giornata ideale per rilassarsi."];
-        document.getElementById('zodiacPhrase').innerText = `${userZodiac}: ${f[new Date().getDate() % 3]}`;
-    }
-
-    function saveZodiac(s) { userZodiac=s; localStorage.setItem('userZodiac',s); updateZodiacDisplay(); togglePanel('zodiacMenu',0); }
-    function togglePanel(id,s) { document.getElementById(id).style.display=s?'flex':'none'; }
-    
-    document.getElementById('zodiacSelector').innerHTML = signs.map(s => `<div class="zodiac-btn" onclick="saveZodiac('${s}')">${s}</div>`).join('');
-    updateAll();
-    setInterval(updateAll, 300000);
+    update("Barletta");
 </script>
 </body>
 </html>
