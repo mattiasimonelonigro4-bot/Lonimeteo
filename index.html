@@ -3,24 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LONImeteo Aero-Precision v1.1</title>
+    <title>LONImeteo - Configurazione Finale v1.3</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #ff9500; --accent: #af52de;
-            --glass: rgba(18, 18, 28, 0.92); --border: rgba(255, 255, 255, 0.12);
-            --bg-blur: blur(50px);
+            --glass: rgba(18, 18, 28, 0.85); --border: rgba(255, 255, 255, 0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'SF Pro Display', sans-serif; color: #fff; height: 100vh; overflow: hidden; background: #000; transition: background 2s ease; position: relative;}
-
-        #cloudLayer {
-            position: fixed; inset: 0; z-index: 1; opacity: 0; transition: opacity 2s ease; pointer-events: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="400" viewBox="0 0 1000 400"><path d="M150,150 a50,50 0 0,1 100,0 a60,60 0 0,1 120,0 a50,50 0 0,1 100,0 Z" fill="white" opacity="0.3"/><path d="M600,200 a40,40 0 0,1 80,0 a50,50 0 0,1 100,0 a40,40 0 0,1 80,0 Z" fill="white" opacity="0.25"/><path d="M400,100 a30,30 0 0,1 60,0 a40,40 0 0,1 80,0 Z" fill="white" opacity="0.2"/></svg>');
-            background-size: 150% auto; animation: driftClouds 60s linear infinite;
-        }
-        @keyframes driftClouds { from { background-position: 0% 20%; } to { background-position: 100% 20%; } }
+        body { font-family: 'SF Pro Display', sans-serif; color: #fff; height: 100vh; overflow: hidden; background: #000; transition: background 2s ease; }
 
         .bg-notte { background: radial-gradient(circle at top, #1a1a2e, #020111) !important; }
         .bg-alba { background: radial-gradient(circle at top, #ff9a9e, #2f3542) !important; }
@@ -33,17 +25,17 @@
         .brand-text { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; flex: 1; text-align: center; margin-left: 35px; }
         .brand-text i { font-family: 'Playfair Display'; font-style: italic; background: linear-gradient(90deg, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .loc-chip { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 30px; margin: 10px auto 20px; width: fit-content; border: 1px solid var(--border); backdrop-filter: var(--bg-blur); cursor: pointer; transition: 0.3s; }
+        .loc-chip { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 30px; margin: 10px auto 20px; width: fit-content; border: 1px solid var(--border); backdrop-filter: blur(15px); cursor: pointer; }
 
         .content-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 18px; padding-bottom: 60px; }
         .content-scroll::-webkit-scrollbar { display: none; }
 
-        .hero { text-align: center; padding: 10px 0 25px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .hero { text-align: center; padding: 10px 0 25px; }
         .main-icon { font-size: 95px; filter: drop-shadow(0 0 35px rgba(255,255,255,0.25)); animation: float 4s ease-in-out infinite; display: inline-block; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
         .main-temp { font-size: 115px; font-weight: 200; letter-spacing: -7px; line-height: 0.9; margin: 15px 0 5px; }
 
-        .glass-card { background: var(--glass); backdrop-filter: var(--bg-blur); border-radius: 35px; border: 1px solid var(--border); padding: 25px; }
+        .glass-card { background: var(--glass); backdrop-filter: blur(50px); border-radius: 35px; border: 1px solid var(--border); padding: 25px; }
 
         .forecast-row { display: grid; grid-template-columns: 85px 1fr 85px; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer; }
         .f-day { font-weight: 600; font-size: 17px; opacity: 0.9; }
@@ -59,6 +51,7 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .close-btn { font-size: 48px; color: var(--primary); cursor: pointer; align-self: flex-end; line-height: 0.8; }
 
+        /* IMPOSTAZIONI RIPRISTINATE */
         #settingsPanel { position: fixed; inset: 0; background: #08080c; z-index: 6000; display: none; flex-direction: column; padding: env(safe-area-inset-top, 20px) 25px; overflow-y: auto; }
         .settings-group { margin-bottom: 30px; }
         .settings-label { font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; display: block; }
@@ -73,8 +66,6 @@
     </style>
 </head>
 <body class="bg-notte">
-
-<div id="cloudLayer"></div>
 
 <div class="app-container">
     <div class="header">
@@ -96,21 +87,21 @@
         </div>
 
         <div class="glass-card">
-            <h3 style="font-size:11px; opacity:0.4; margin-bottom:12px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase;">Bollettino Aeronautico</h3>
+            <h3 style="font-size:11px; opacity:0.4; margin-bottom:12px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase;">Tendenza 7 Giorni</h3>
             <div id="forecastTarget"></div>
         </div>
 
         <div class="info-grid">
-            <div class="info-item" onclick="openParam('Umidità', 'Dato stabile.', '💧', 'linear-gradient(135deg, #2193b0, #6dd5ed)', '64%')">
+            <div class="info-item" onclick="openParam('Umidità', 'L\'aria è così umida che potresti nuotare fino al bar. Ottima per i capelli ricci (o per sembrare un leone).', '💧', 'linear-gradient(135deg, #2193b0, #6dd5ed)', '64%')">
                 <label>Umidità</label><div class="info-val">64%</div>
             </div>
-            <div class="info-item" onclick="openParam('Pressione', 'QNH 1014.', '⏲️', 'linear-gradient(135deg, #1e3c72, #2a5298)', '1014')">
+            <div class="info-item" onclick="openParam('Pressione', '1014 hPa. Il cielo ci sta schiacciando con grazia. Niente mal di testa per oggi, pilota!', '⏲️', 'linear-gradient(135deg, #1e3c72, #2a5298)', '1014')">
                 <label>Pressione</label><div class="info-val">1014</div>
             </div>
-            <div class="info-item" onclick="openParam('Visibilità', '>10km.', '👁️', 'linear-gradient(135deg, #3a1c71, #d76d77)', '>10km')">
+            <div class="info-item" onclick="openParam('Visibilità', 'Vedi talmente lontano che potresti scorgere il tuo futuro (spoiler: è radioso). >10km garantiti.', '👁️', 'linear-gradient(135deg, #3a1c71, #d76d77)', '>10km')">
                 <label>Visibilità</label><div class="info-val">>10km</div>
             </div>
-            <div class="info-item" onclick="openParam('Indice UV', 'Lieve.', '☀️', 'linear-gradient(135deg, #f093fb, #f5576c)', 'Basso')">
+            <div class="info-item" onclick="openParam('Indice UV', 'Il sole oggi è timido. Puoi uscire senza sembrare un peperone grigliato entro dieci minuti.', '☀️', 'linear-gradient(135deg, #f093fb, #f5576c)', 'Lieve')">
                 <label>Indice UV</label><div class="info-val">Lieve</div>
             </div>
         </div>
@@ -130,6 +121,7 @@
         <h2 style="font-size:36px; font-weight:800;">Controllo</h2>
         <div class="close-btn" onclick="toggleSettings(false)">×</div>
     </div>
+
     <div class="settings-group">
         <label class="settings-label">Localizzazione</label>
         <div class="setting-row">
@@ -137,6 +129,22 @@
             <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
         </div>
     </div>
+
+    <div class="settings-group">
+        <label class="settings-label">Unità</label>
+        <div class="setting-row" onclick="alert('Unità bloccate su Sistema Metrico Aeronautico')">
+            <b>Scala Temperature</b>
+            <span style="color:var(--primary)">Celsius (°C)</span>
+        </div>
+    </div>
+
+    <div class="settings-group">
+        <label class="settings-label">Supporto</label>
+        <div class="setting-row" onclick="alert('Segnalazione inviata con successo!')"><b>🪲 Segnala un Bug</b></div>
+        <div class="setting-row" onclick="alert('Un esperto ti risponderà a breve (forse)')"><b>🎧 Assistenza Diretta</b></div>
+    </div>
+
+    <div style="text-align:center; padding: 40px 0; color:#ff3b30; font-weight:800; cursor:pointer;" onclick="toggleSettings(false)">CHIUDI IMPOSTAZIONI</div>
 </div>
 
 <div class="overlay" id="mainOverlay">
@@ -150,24 +158,11 @@
         const b = document.body;
         const icon = document.getElementById('mainIcon');
         const status = document.getElementById('mainStatus');
-        const clouds = document.getElementById('cloudLayer');
-        
         let iconChar = "☀️";
-        clouds.style.opacity = '0';
-
-        if (h >= 5 && h < 8) {
-            b.className = 'bg-alba';
-            clouds.style.opacity = '0.7';
-        } else if (h >= 8 && h < 18) {
-            b.className = 'bg-giorno';
-            clouds.style.opacity = '0.6';
-        } else if (h >= 18 && h < 21) {
-            b.className = 'bg-tramonto';
-        } else {
-            b.className = 'bg-notte';
-            iconChar = "🌙";
-        }
-
+        if (h >= 5 && h < 8) b.className = 'bg-alba';
+        else if (h >= 8 && h < 18) b.className = 'bg-giorno';
+        else if (h >= 18 && h < 21) b.className = 'bg-tramonto';
+        else { b.className = 'bg-notte'; iconChar = "🌙"; }
         icon.innerText = iconChar;
         status.innerText = (iconChar === "🌙") ? "Notte Serena" : "Cielo Sereno";
 
@@ -195,11 +190,11 @@
     }
 
     function openParam(title, desc, emoji, bg, val) {
-        showOv(`<h2 style="font-size:32px; color:var(--primary); margin-bottom:10px;">${title}</h2><p style="font-size:24px; font-weight:700; margin-bottom:15px;">Valore attuale: ${val}</p><p>${desc}</p>`);
+        showOv(`<div style="font-size:60px; margin-bottom:20px;">${emoji}</div><h2 style="font-size:32px; color:var(--primary); margin-bottom:10px;">${title}</h2><p style="font-size:28px; font-weight:700; margin-bottom:15px;">${val}</p><p style="opacity:0.9;">${desc}</p>`);
     }
 
     function openAstronomia() {
-        showOv(`<h2 style="font-size:32px; color:var(--primary); margin-bottom:15px;">Astronomia</h2><p>Luna Piena al 98%. Condizioni ottimali per l'osservazione notturna.</p>`);
+        showOv(`<h2 style="font-size:32px; color:var(--primary); margin-bottom:15px;">Astronomia</h2><p>Luna Piena al 98%. Perfetta per trasformarsi in lupi mannari o semplicemente per una passeggiata romantica senza inciampare.</p>`);
     }
 
     function showOv(content) {
