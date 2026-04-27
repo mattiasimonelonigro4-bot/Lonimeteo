@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>LONImeteo® Titan v31.1</title>
+    <title>LONImeteo® Titan v31.3</title>
     <style>
         :root { 
             --gold: #D4AF37; 
@@ -15,7 +15,6 @@
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:'Inter', sans-serif; }
         body { background:#000; color:#fff; overflow:hidden; height:100vh; position:fixed; width:100vw; }
         
-        /* LOGO OVERLAY */
         #splash { position:fixed; inset:0; background:#000; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s var(--bezier); }
         .main-logo { font-size: 24px; font-weight: 900; letter-spacing: 12px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
         .logo-sub { font-size: 8px; letter-spacing: 4px; opacity: 0.5; }
@@ -25,26 +24,28 @@
         #app-rail::-webkit-scrollbar { display: none; }
 
         .section-name { font-size: 10px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; text-align: left; margin: 30px 0 10px; font-weight: 900; }
-        .brand-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .registered { font-size:10px; letter-spacing:5px; color:var(--gold); font-weight:900; text-transform: uppercase; }
+        .registered { font-size:10px; letter-spacing:5px; color:var(--gold); font-weight:900; text-transform: uppercase; text-align: left; }
         #city-display { font-weight:400; font-size:36px; letter-spacing:-1.5px; text-transform: uppercase; text-align: left; }
 
-        .alert-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 25px; padding: 18px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px; transition: 0.5s; text-align: left; }
+        .alert-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 25px; padding: 18px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px; text-align: left; }
         .alert-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
-        .alert-info b { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .alert-info b { display: block; font-size: 13px; text-transform: uppercase; }
         .alert-info span { font-size: 11px; opacity: 0.6; }
 
-        .hero-temp { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 15px 0 35px; }
+        .hero-temp { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 15px 0 10px; }
         #temp-big { font-size:115px; font-weight:200; letter-spacing:-6px; }
         .weather-icon-wrap { position: relative; width: 90px; height: 90px; }
         .sun-realistic { width: 75px; height: 75px; border-radius: 50%; animation: sunBeam 4s infinite ease-in-out; }
         @keyframes sunBeam { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.1); filter: brightness(1.3); } }
 
+        .extreme-range { display: flex; justify-content: center; gap: 25px; margin-bottom: 35px; font-weight: 300; font-size: 16px; letter-spacing: 1px; }
+        .extreme-range span { color: var(--gold); font-weight: 800; font-size: 10px; margin-right: 5px; }
+
         .astral-widget { background:var(--glass); border:1px solid var(--border); border-radius:35px; padding:25px 20px; backdrop-filter:blur(30px); margin-bottom: 20px; position: relative; }
         .orbital-view { position:relative; width:100%; height:45px; border-bottom: 1.5px dashed rgba(212, 175, 55, 0.3); border-radius: 50% 50% 0 0; margin-bottom: 15px; }
         #sun-orb { position:absolute; width:18px; height:18px; border-radius:50%; bottom:-9px; transform:translateX(-50%); transition: all 1s linear; display: flex; align-items: center; justify-content: center; font-size: 10px; }
         .time-labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.5); }
-        #phase-id { color:var(--gold); text-align:center; text-transform: uppercase; letter-spacing: 1px; }
+        #phase-id { color:var(--gold); text-align:center; text-transform: uppercase; }
 
         .grid-4 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom: 20px; }
         .tile { background:var(--glass); border:1px solid var(--border); border-radius:28px; padding:20px; text-align:left; transition: 0.4s var(--bezier); overflow: hidden; height: 110px; }
@@ -55,6 +56,9 @@
         .forecast-card { background:var(--glass); border:1px solid var(--border); border-radius:28px; margin-bottom:10px; padding:22px; transition: 0.4s var(--bezier); overflow: hidden; height: 85px; }
         .forecast-card.active { height: 215px; border-color: var(--gold); background: rgba(255,255,255,0.12); }
         .forecast-main { display:flex; justify-content:space-between; align-items:center; }
+        .forecast-temps { text-align: right; line-height: 1; }
+        .f-max { color: var(--gold); font-size: 20px; font-weight: 700; display: block; }
+        .f-min { font-size: 12px; opacity: 0.6; font-weight: 300; }
 
         .graph-info { display: flex; flex-direction: column; font-size: 9px; color: var(--gold); margin-top: 10px; opacity: 0; transition: 0.3s; line-height: 1.4; }
         .active .graph-info { opacity: 1; }
@@ -67,17 +71,16 @@
         .ctrl-btn { width:45px; height:45px; background:rgba(255,255,255,0.1); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:18px; }
         
         .modal { position:fixed; inset:0; z-index:5000; background:rgba(0,0,0,0.85); backdrop-filter:blur(40px); display:none; align-items:center; justify-content:center; padding: 20px; }
-        .modal-body { background:rgba(10,10,10,0.95); border:1px solid var(--gold); border-radius:35px; padding:35px 25px; width:100%; max-width: 400px; max-height: 80vh; overflow-y: auto; text-align: left; }
-        input { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(212, 175, 55, 0.3); border-radius:20px; padding:18px; color:#fff; font-size:16px; outline:none; margin-bottom: 20px; }
-        .city-item { padding:18px; border-radius:15px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border: 1px solid transparent; cursor: pointer; }
-        .city-item:active { background: var(--gold); color: #000; }
+        .modal-body { background:rgba(10,10,10,0.95); border:1px solid var(--gold); border-radius:35px; padding:35px 25px; width:100%; max-width: 400px; text-align: left; }
+        input { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(212, 175, 55, 0.3); border-radius:20px; padding:18px; color:#fff; outline:none; margin-bottom: 20px; }
+        .city-item { padding:18px; border-radius:15px; margin-bottom: 8px; background: rgba(255,255,255,0.03); cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="splash">
     <div class="main-logo">LONImeteo®</div>
-    <div class="logo-sub">TITAN ARCHITECTURE v31.1</div>
+    <div class="logo-sub">TITAN ARCHITECTURE v31.3</div>
 </div>
 
 <div id="sky-sync"></div>
@@ -88,16 +91,14 @@
 </div>
 
 <div id="app-rail">
-    <div class="brand-header">
-        <p class="registered">LONImeteo®</p>
-    </div>
+    <p class="registered">LONImeteo®</p>
     <h1 id="city-display">---</h1>
     
-    <div class="alert-box" id="pc-bulletin">
+    <div class="alert-box">
         <div class="alert-dot" id="pc-dot"></div>
         <div class="alert-info">
-            <b id="pc-lvl">CRITICITÀ: VERDE</b>
-            <span id="pc-msg">Zona Puglia-G: Operativo.</span>
+            <b id="pc-lvl">SISTEMA: OK</b>
+            <span id="pc-msg">Caricamento dati Titan...</span>
         </div>
     </div>
 
@@ -106,6 +107,11 @@
         <div class="weather-icon-wrap">
             <div id="sun-hero" class="sun-realistic"></div>
         </div>
+    </div>
+
+    <div class="extreme-range">
+        <div><span>MIN</span><b id="hero-min">--°</b></div>
+        <div><span>MAX</span><b id="hero-max">--°</b></div>
     </div>
 
     <div class="section-name">Dinamica Astrale</div>
@@ -131,8 +137,8 @@
             <div class="card-expand"><svg viewBox="0 0 350 120"><path class="line"/></svg></div>
         </div>
         <div class="tile" onclick="toggleCard(this, 'cloud_cover', '#D4AF37')">
-            <span>POLLINI</span><b>MEDIO</b>
-            <div class="graph-info"><span>RILEVAMENTO:</span><b style="color:#fff;">STABILE</b></div>
+            <span>COPERTURA</span><b id="q-cloud">--%</b>
+            <div class="graph-info"><span>RILEVAMENTO:</span><b id="v-cloud" style="color:#fff;">--</b></div>
             <div class="card-expand"><svg viewBox="0 0 350 120"><path class="line"/></svg></div>
         </div>
         <div class="tile" onclick="toggleCard(this, 'visibility', '#fff')">
@@ -148,18 +154,18 @@
 
 <div id="search-modal" class="modal" onclick="if(event.target==this)this.style.display='none'">
     <div class="modal-body">
-        <h3 style="color:var(--gold); margin-bottom:15px; font-weight:300;">Dove vuoi andare?</h3>
-        <input type="text" id="city-input" placeholder="Cerca una località..." oninput="suggestCity(this.value)">
+        <h3 style="color:var(--gold); margin-bottom:15px; font-weight:300;">Località</h3>
+        <input type="text" id="city-input" placeholder="Cerca..." oninput="suggestCity(this.value)">
         <div id="results-list"></div>
     </div>
 </div>
 
 <div id="settings-modal" class="modal" onclick="if(event.target==this)this.style.display='none'">
     <div class="modal-body">
-        <h2 style="color:var(--gold); margin-bottom:15px;">TITAN v31.1</h2>
-        <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:25px;">
-            <p><b>Status:</b> Sigillato / Operativo</p>
-            <p style="margin-top:10px; font-size:12px; opacity:0.6;">LONImeteo® Lab - Barletta (BT)</p>
+        <h2 style="color:var(--gold); margin-bottom:15px;">TITAN v31.3</h2>
+        <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:25px; font-size: 13px;">
+            <p><b>Status:</b> Sigillato</p>
+            <p style="margin-top:10px; opacity:0.6;">LONImeteo® Lab</p>
         </div>
     </div>
 </div>
@@ -175,17 +181,15 @@
 
     async function suggestCity(q) {
         if(q.length < 3) return;
-        const r = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${q}&limit=10&appid=${K}`);
+        const r = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${q}&limit=5&appid=${K}`);
         const data = await r.json();
         const seen = new Set();
-        const unique = data.filter(c => {
+        document.getElementById('results-list').innerHTML = data.filter(c => {
             const id = `${c.name}-${c.state}-${c.country}`.toLowerCase();
             return seen.has(id) ? false : seen.add(id);
-        });
-        document.getElementById('results-list').innerHTML = unique.map(c => 
+        }).map(c => 
             `<div class="city-item" onclick="init('${c.name}'); document.getElementById('search-modal').style.display='none'">
-                <b>${c.name.toUpperCase()}</b><br>
-                <span style="font-size:10px; opacity:0.5;">${c.state ? c.state + ', ' : ''}${c.country}</span>
+                <b>${c.name.toUpperCase()}</b> <span style="opacity:0.5; font-size:10px;">${c.country}</span>
             </div>`
         ).join('');
     }
@@ -202,7 +206,7 @@
         let data = (typeof type === 'number') ? db.temperature_2m.slice(type*24, (type*24)+24) : (db[type] ? db[type].slice(0, 24) : [0,0,0]);
         const mx = Math.max(...data), mn = Math.min(...data);
         if(el.querySelector('[id^="v-"]')) {
-            const unit = {relative_humidity_2m:'%', wind_speed_10m:'km/h', visibility:'km'}[type] || "";
+            const unit = {relative_humidity_2m:'%', wind_speed_10m:'km/h', visibility:'km', cloud_cover:'%'}[type] || "";
             el.querySelector('[id^="v-"]').innerText = `MIN ${mn}${unit} / MAX ${mx}${unit}`;
         } else if (el.querySelector('.f-info')) {
             el.querySelector('.f-info').innerHTML = `PIOGGIA: ${dDaily.precipitation_probability_max[type]}% | RANGE: ${mn}°/${mx}°`;
@@ -221,15 +225,18 @@
         document.getElementById('q-hum').innerText = d.main.humidity+'%';
         document.getElementById('q-wind').innerText = Math.round(d.wind.speed * 3.6)+' km/h';
         document.getElementById('q-vis').innerText = (d.visibility/1000).toFixed(1)+' km';
+        document.getElementById('hero-min').innerText = Math.round(d.main.temp_min)+'°';
+        document.getElementById('hero-max').innerText = Math.round(d.main.temp_max)+'°';
 
-        const or = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${d.coord.lat}&longitude=${d.coord.lon}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,visibility,cloud_cover&daily=weathercode,temperature_2m_max,precipitation_probability_max,precipitation_sum&forecast_days=7&timezone=auto`);
+        const or = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${d.coord.lat}&longitude=${d.coord.lon}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,visibility,cloud_cover&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=7&timezone=auto`);
         const od = await or.json(); db = od.hourly; dDaily = od.daily;
+        
+        document.getElementById('q-cloud').innerText = db.cloud_cover[0]+'%';
 
         const windKmh = d.wind.speed * 3.6;
         const pcDot = document.getElementById('pc-dot'), pcLvl = document.getElementById('pc-lvl'), pcMsg = document.getElementById('pc-msg');
-        if(windKmh > 60) { pcDot.style.background = "var(--orange)"; pcLvl.innerText = "CRITICITÀ: ARANCIONE"; pcMsg.innerText = "Allerta Vento: Raffiche intense."; }
-        else if(windKmh > 35) { pcDot.style.background = "var(--yellow)"; pcLvl.innerText = "CRITICITÀ: GIALLA"; pcMsg.innerText = "Avviso Meteo: Venti forti."; }
-        else { pcDot.style.background = "var(--green)"; pcLvl.innerText = "CRITICITÀ: VERDE"; pcMsg.innerText = "Puglia-G: Nessun fenomeno rilevante."; }
+        if(windKmh > 50) { pcDot.style.background = "var(--orange)"; pcLvl.innerText = "ALLERTA VENTO"; pcMsg.innerText = "Raffiche intense in corso."; }
+        else { pcDot.style.background = "var(--green)"; pcLvl.innerText = "SISTEMA: OK"; pcMsg.innerText = "Nessun fenomeno rilevante."; }
 
         const isDay = d.dt > d.sys.sunrise && d.dt < d.sys.sunset;
         const sunCol = isDay ? "radial-gradient(circle, #fff 0%, #ffcc00 40%, #ff8800 100%)" : "radial-gradient(circle, #fff 0%, #a0a0a0 100%)";
@@ -251,7 +258,10 @@
                 <div class="forecast-main">
                     <b>${i===0?"OGGI":new Date(t).toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</b>
                     <span style="font-size:24px;">${od.daily.weathercode[i] > 3 ? '☁️' : '☀️'}</span>
-                    <b style="color:var(--gold); font-size:20px;">${Math.round(od.daily.temperature_2m_max[i])}°</b>
+                    <div class="forecast-temps">
+                        <span class="f-max">${Math.round(od.daily.temperature_2m_max[i])}°</span>
+                        <span class="f-min">${Math.round(od.daily.temperature_2m_min[i])}°</span>
+                    </div>
                 </div>
                 <div class="graph-info"><span class="f-info" style="color:#fff;">...</span></div>
                 <div class="card-expand"><svg viewBox="0 0 350 120"><path class="line"/></svg></div>
@@ -261,7 +271,7 @@
             document.getElementById('splash').style.opacity = '0';
             document.getElementById('app-rail').style.opacity = '1';
             setTimeout(() => document.getElementById('splash').style.display = 'none', 1000);
-        }, 2000);
+        }, 1500);
     }
     init("Barletta");
 </script>
