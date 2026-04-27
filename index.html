@@ -3,172 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LONImeteo v4.2 - Dynamic Engine</title>
+    <title>LONImeteo v5.8 - Full Detail</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #ff9500; --accent: #af52de; --danger: #ff3b30; --glass: rgba(18, 18, 28, 0.85); --border: rgba(255, 255, 255, 0.12); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'SF Pro Display', sans-serif; color: #fff; background: #000; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'SF Pro Display', sans-serif; color: #fff; background: #000; min-height: 100vh; transition: 0.8s; overflow-x: hidden; }
         .bg-notte { background: radial-gradient(circle at top, #1a1a2e, #020111) fixed !important; }
         .bg-giorno { background: radial-gradient(circle at top, #4facfe, #001f3f) fixed !important; }
-        .app-container { padding: env(safe-area-inset-top, 20px) 22px; }
+        
+        .app-container { padding: env(safe-area-inset-top, 20px) 22px 40px; }
         .header-main { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 5px; }
         .brand-text { font-size: 30px; font-weight: 800; letter-spacing: -1px; flex: 1; text-align: center; }
         .brand-text i { font-family: 'Playfair Display'; font-style: italic; background: linear-gradient(90deg, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .city-badge { text-align: center; font-size: 14px; font-weight: 700; opacity: 0.5; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-        .alert-box { background: rgba(255, 59, 48, 0.15); border: 1px solid var(--danger); border-left: 5px solid var(--danger); border-radius: 20px; padding: 20px; margin: 15px 0; display: none; backdrop-filter: blur(10px); }
-        .hero { text-align: center; padding: 10px 0 35px; }
+        
+        .hero { text-align: center; padding: 10px 0 30px; }
         .main-temp { font-size: 110px; font-weight: 200; letter-spacing: -6px; line-height: 0.9; }
-        .weather-bulletin { font-size: 15px; line-height: 1.4; opacity: 0.9; margin-bottom: 20px; text-align: center; }
-        .glass-card { background: var(--glass); backdrop-filter: blur(50px); border-radius: 30px; border: 1px solid var(--border); padding: 22px; margin-bottom: 15px; cursor: pointer; }
-        .glass-card label { font-size: 11px; font-weight: 800; opacity: 0.4; letter-spacing: 1px; display: block; margin-bottom: 10px; text-transform: uppercase; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .info-item { background: var(--glass); border-radius: 25px; padding: 20px; border: 1px solid var(--border); cursor: pointer; }
-        .info-item label { font-size: 10px; font-weight: 800; opacity: 0.4; display: block; margin-bottom: 8px; text-transform: uppercase; }
-        .info-val { font-size: 24px; font-weight: 700; }
+        
+        .glass-card { background: var(--glass); backdrop-filter: blur(50px); border-radius: 30px; border: 1px solid var(--border); padding: 22px; margin-bottom: 15px; }
+        .glass-card label { font-size: 11px; font-weight: 800; opacity: 0.4; display: block; margin-bottom: 12px; text-transform: uppercase; }
+        
+        .forecast-row { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .forecast-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .day-name { font-weight: 700; font-size: 16px; width: 80px; }
+        .day-temp { font-weight: 700; color: var(--primary); }
+
+        .day-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .slot { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 12px; text-align: center; }
+        .slot-label { font-size: 9px; opacity: 0.5; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .slot-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+        .slot-desc { font-size: 10px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .info-item { background: var(--glass); border-radius: 25px; padding: 20px; border: 1px solid var(--border); transition: 0.3s; }
+        .info-item:active { transform: scale(0.96); }
+        .info-val { font-size: 22px; font-weight: 700; display: block; margin-top: 5px; }
+
         .full-panel { position: fixed; inset: 0; background: #08080c; z-index: 7000; display: none; flex-direction: column; padding: 60px 25px; overflow-y: auto; }
+        .close-btn-red { color: var(--danger); font-size: 45px; font-weight: 200; position: absolute; top: 40px; right: 25px; cursor: pointer; }
+        
         .zodiac-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
         .zodiac-btn { background: rgba(255,255,255,0.05); padding: 15px 5px; border-radius: 15px; text-align: center; font-size: 12px; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 8000; display: none; flex-direction: column; padding: 60px 24px; }
-        .overlay-card { background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 100%); border-radius: 40px; padding: 35px; border: 1px solid var(--border); flex: 1; text-align: center; }
+        .menu-item { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body class="bg-notte">
+
 <div class="app-container">
     <div class="header-main">
         <div onclick="togglePanel('searchPanel', 1)" style="font-size:24px;cursor:pointer">🔍</div>
         <div class="brand-text">LONI<i>meteo</i></div>
         <div onclick="togglePanel('settingsPanel', 1)" style="font-size:24px;cursor:pointer;text-align:right">⚙️</div>
     </div>
-    <div class="city-badge" id="cityName">Barletta</div>
-    <div id="emergencyAlert" class="alert-box"><div id="alertMsg"></div></div>
+    
+    <div id="cityName" style="text-align:center; font-size:14px; font-weight:700; opacity:0.5; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px;">BARLETTA</div>
     
     <div class="hero">
-        <div id="mainEmoji" style="font-size:50px;margin-bottom:10px">🌙</div>
+        <div id="mainEmoji" style="font-size:60px;margin-bottom:10px">☀️</div>
         <div class="main-temp" id="tempDisp">--°</div>
-        <div class="main-status" id="statusDisp" style="margin-top:10px">Sincronizzazione...</div>
+        <div id="statusDisp" style="margin-top:10px; font-weight:600; color:var(--primary)">Sincronizzazione...</div>
     </div>
 
     <div class="glass-card" id="zodiacCard" style="display:none; border-left:4px solid var(--accent)">
-        <label id="zodiacLabel">Oroscopo del Giorno</label>
+        <label>FRASE DEL GIORNO</label>
         <div id="zodiacPhrase" style="font-style:italic; font-size:15px; line-height:1.4"></div>
     </div>
 
-    <div class="weather-bulletin" id="bulletinDisp">Analisi flussi...</div>
-    
-    <div class="glass-card" onclick="openHourly()"><label>Prossimi 7 Giorni</label><div id="forecast7"></div></div>
-    
-    <div class="info-grid" id="paramsGrid"></div>
+    <div class="glass-card">
+        <label>Previsioni Settimanali</label>
+        <div id="forecast7"></div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-item" onclick="showInfo('Umidità', 'La percentuale di acqua nell\'aria. Alta umidità rende il caldo più afoso e il freddo più pungente!')">
+            <label>💧 Umidità</label><div class="info-val" id="humVal">--</div>
+        </div>
+        <div class="info-item" onclick="showInfo('Pressione', 'Il peso dell\'aria. Quando scende drasticamente, il brutto tempo è dietro l\'angolo!')">
+            <label>⏲️ Pressione</label><div class="info-val" id="presVal">--</div>
+        </div>
+        <div class="info-item" onclick="showInfo('Vento', 'Semplice aria in movimento. Ottimo per rinfrescarsi, pessimo per gli ombrelli aperti!')">
+            <label>🌬️ Vento</label><div class="info-val" id="windVal">--</div>
+        </div>
+        <div class="info-item" onclick="showInfo('Fase Lunare', 'L\'aspetto della luna stasera. Influenza maree e... leggende metropolitane!')">
+            <label>🌙 Luna</label><div class="info-val" id="moonVal">Crescente</div>
+        </div>
+    </div>
+</div>
+
+<div id="infoPanel" class="full-panel">
+    <div class="close-btn-red" onclick="togglePanel('infoPanel', 0)">×</div>
+    <div id="infoTitle" style="font-size:30px;font-weight:800;margin-bottom:20px;color:var(--primary)"></div>
+    <div id="infoText" style="font-size:18px;line-height:1.6;opacity:0.8"></div>
 </div>
 
 <div id="searchPanel" class="full-panel">
-    <div style="font-size:30px;font-weight:800;margin-bottom:20px">Città <span onclick="togglePanel('searchPanel', 0)">×</span></div>
-    <div onclick="setCity('Barletta')" style="padding:20px;border-bottom:1px solid #222">📍 Barletta</div>
-    <div onclick="setCity('Roma')" style="padding:20px;border-bottom:1px solid #222">Roma</div>
-    <div onclick="setCity('Milano')" style="padding:20px;border-bottom:1px solid #222">Milano</div>
+    <div class="close-btn-red" onclick="togglePanel('searchPanel', 0)">×</div>
+    <div style="font-size:30px;font-weight:800;margin-bottom:20px">Città</div>
+    <input type="text" id="citySearch" placeholder="Cerca una città..." style="width:100%; padding:18px; border-radius:20px; background:#111; border:1px solid #333; color:white; font-size:16px;">
+    <div onclick="updateAll(document.getElementById('citySearch').value)" style="background:var(--primary); padding:18px; border-radius:20px; text-align:center; font-weight:800; margin-top:15px;">AGGIORNA</div>
 </div>
 
 <div id="settingsPanel" class="full-panel">
-    <div style="font-size:30px;font-weight:800;margin-bottom:20px">Segno <span onclick="togglePanel('settingsPanel', 0)">×</span></div>
-    <div class="zodiac-grid" id="zodiacSelector">
-        <div class="zodiac-btn" onclick="saveZodiac('Ariete')">♈ Ariete</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Toro')">♉ Toro</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Gemelli')">♊ Gemelli</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Cancro')">♋ Cancro</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Leone')">♌ Leone</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Vergine')">♍ Vergine</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Bilancia')">♎ Bilancia</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Scorpione')">♏ Scorpione</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Sagittario')">♐ Sagittario</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Capricorno')">♑ Capricorno</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Acquario')">♒ Acquario</div>
-        <div class="zodiac-btn" onclick="saveZodiac('Pesci')">♓ Pesci</div>
-    </div>
-    <div style="margin-top:auto;text-align:center;padding:20px" onclick="togglePanel('settingsPanel', 0)">CHIUDI</div>
+    <div class="close-btn-red" onclick="togglePanel('settingsPanel', 0)">×</div>
+    <div style="font-size:30px;font-weight:800;margin-bottom:30px">Impostazioni</div>
+    <div class="menu-item" onclick="togglePanel('zodiacMenu', 1)"><span>Frasi del Giorno</span><span>〉</span></div>
+    <div class="menu-item"><span>Unità: Celsius</span><span style="color:var(--primary)">✔</span></div>
+    <div class="menu-item" onclick="alert('Inviato!')"><span>Segnala un Bug</span><span>🐞</span></div>
+    <div class="menu-item" onclick="alert('In attesa...')"><span>Assistenza</span><span>🎧</span></div>
 </div>
 
-<div class="overlay" id="mainOverlay"><div style="text-align:right;font-size:35px;color:var(--primary)" onclick="closeOverlay()">×</div><div class="overlay-card" id="ovContent"></div></div>
+<div id="zodiacMenu" class="full-panel">
+    <div style="font-size:24px;font-weight:800;margin-bottom:20px"><span onclick="togglePanel('zodiacMenu', 0)">〈</span> Scegli Segno</div>
+    <div class="zodiac-grid" id="zodiacSelector"></div>
+</div>
 
 <script>
+    const API_KEY = "92861dce42dbac09fa9bae55f8f38550"; 
     let currentCity = "Barletta";
     let userZodiac = localStorage.getItem('userZodiac') || "";
+    const signs = ['Ariete','Toro','Gemelli','Cancro','Leone','Vergine','Bilancia','Scorpione','Sagittario','Capricorno','Acquario','Pesci'];
 
-    const zodiacBase = {
-        'Ariete': ["Energia alle stelle.", "Evita scontri.", "Punta al successo."],
-        'Toro': ["Calma necessaria.", "Piacere in vista.", "Sii costante."],
-        'Gemelli': ["Idee brillanti.", "Comunicazione top.", "Viaggio mentale."],
-        'Cancro': ["Emozioni forti.", "Proteggi il cuore.", "Sogno lucido."],
-        'Leone': ["Protagonista oggi.", "Orgoglio sano.", "Luce ovunque."],
-        'Vergine': ["Ordine mentale.", "Dettagli chiave.", "Salute prima."],
-        'Bilancia': ["Armonia cercasi.", "Scelta giusta.", "Eleganza pura."],
-        'Scorpione': ["Intuito acuto.", "Mistero svelato.", "Passione vera."],
-        'Sagittario': ["Vento di libertà.", "Orizzonti nuovi.", "Ottimismo."],
-        'Capricorno': ["Vetta vicina.", "Lavoro ripagato.", "Roccia vera."],
-        'Acquario': ["Genio creativo.", "Libertà totale.", "Amici cari."],
-        'Pesci': ["Magia nell'aria.", "Ascolta l'anima.", "Acqua calma."]
-    };
-
-    const forecastData = [
-        { d: "Oggi", i: "☀️", t: "23°", m: "13°" },
-        { d: "Mar", i: "⛈️", t: "17°", m: "11°" },
-        { d: "Mer", i: "🌦️", t: "19°", m: "12°" },
-        { d: "Gio", i: "☁️", t: "21°", m: "14°" },
-        { d: "Ven", i: "☀️", t: "24°", m: "15°" },
-        { d: "Sab", i: "☀️", t: "25°", m: "16°" },
-        { d: "Dom", i: "☀️", t: "26°", m: "16°" }
-    ];
-
-    async function checkAlerts() {
+    async function updateAll(city = currentCity) {
+        currentCity = city;
+        document.getElementById('cityName').innerText = city.toUpperCase();
         try {
-            const res = await fetch('https://api.jsonbin.io/v3/b/65e9d3d31f5677401f39648a');
-            const data = await res.json();
-            const box = document.getElementById('emergencyAlert');
-            if(data.record && data.record.attiva) {
-                box.style.display = 'block';
-                document.getElementById('alertMsg').innerHTML = `⚠️ <b>${data.record.titolo}:</b> ${data.record.messaggio}`;
-            } else box.style.display = 'none';
-        } catch(e) { console.log("Alert offline"); }
-    }
-
-    function updateApp() {
-        const h = new Date().getHours();
-        const d = new Date().getDate();
-        const isNight = h>=21 || h<6;
-        document.body.className = isNight ? 'bg-notte' : 'bg-giorno';
-        document.getElementById('mainEmoji').innerText = isNight ? "🌙" : "☀️";
-        document.getElementById('tempDisp').innerText = isNight ? "13°" : "23°";
-        document.getElementById('statusDisp').innerText = isNight ? "Notte Serena" : "Sereno";
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=it`);
+            const d = await res.json();
+            if(d.main) {
+                document.getElementById('tempDisp').innerText = Math.round(d.main.temp) + "°";
+                document.getElementById('statusDisp').innerText = d.weather[0].description;
+                document.getElementById('humVal').innerText = d.main.humidity + "%";
+                document.getElementById('presVal').innerText = d.main.pressure + " hPa";
+                document.getElementById('windVal').innerText = d.wind.speed + " m/s";
+            }
+        } catch(e) {}
         
-        document.getElementById('forecast7').innerHTML = forecastData.map(f => `
-            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-                <span style="width:50px">${f.d}</span><span>${f.i}</span><span style="width:80px;text-align:right">${f.t} <small style="opacity:0.4">${f.m}</small></span>
-            </div>`).join('');
-
-        if(userZodiac) {
-            document.getElementById('zodiacCard').style.display = 'block';
-            document.getElementById('zodiacLabel').innerText = `OROSCOPO ${userZodiac.toUpperCase()}`;
-            // Frase che cambia ogni giorno usando il giorno del mese come indice
-            const phraseIdx = d % 3;
-            document.getElementById('zodiacPhrase').innerText = `${zodiacBase[userZodiac][phraseIdx]} Il meteo influenzerà il tuo umore, segui i segnali.`;
-        }
-
-        document.getElementById('paramsGrid').innerHTML = `
-            <div class="info-item" onclick="openParam('Umidità','💧','64%','Aria perfetta.')"><label>💧 Umidità</label><div class="info-val">64%</div></div>
-            <div class="info-item" onclick="openParam('Visibilità','👁️','Top','Oltre 10km.')"><label>👁️ Visibilità</label><div class="info-val">Top</div></div>
-            <div class="info-item" onclick="openParam('Pressione','⏲️','1014','Stabile.')"><label>⏲️ Pressione</label><div class="info-val">1014</div></div>
-            <div class="info-item" onclick="openParam('Indice UV','☀️','Lieve','Nessun rischio.')"><label>☀️ Indice UV</label><div class="info-val">Lieve</div></div>
-        `;
+        const h = new Date().getHours();
+        document.body.className = (h>=21 || h<6) ? 'bg-notte' : 'bg-giorno';
+        document.getElementById('mainEmoji').innerText = (h>=21 || h<6) ? "🌙" : "☀️";
+        updateZodiacDisplay();
+        renderForecast();
+        togglePanel('searchPanel', 0);
     }
 
-    function saveZodiac(sign) { userZodiac = sign; localStorage.setItem('userZodiac', sign); updateApp(); togglePanel('settingsPanel', 0); }
-    function setCity(c) { currentCity=c; document.getElementById('cityName').innerText=c; updateApp(); togglePanel('searchPanel',0); }
-    function openHourly() { showOv(`<h2 style="color:var(--primary)">Dettaglio</h2><p>Previsione dinamica basata su flussi METAR.</p>`); }
-    function openParam(t,i,v,d) { showOv(`<span style="font-size:70px">${i}</span><h2 style="color:var(--primary)">${t}</h2><div style="font-size:40px">${v}</div><p>${d}</p>`); }
-    function showOv(c) { document.getElementById('ovContent').innerHTML=c; document.getElementById('mainOverlay').style.display='flex'; }
-    function closeOverlay() { document.getElementById('mainOverlay').style.display='none'; }
-    function togglePanel(id,s) { document.getElementById(id).style.display=s?'flex':'none'; }
+    function renderForecast() {
+        const days = ["Oggi","Mar","Mer","Gio","Ven","Sab","Dom"];
+        const weather = [
+            { m: "☀️", md: "Limpido", p: "⛅", pd: "Nubi", s: "🌙", sd: "Sereno" },
+            { m: "☁️", md: "Coperto", p: "⛈️", pd: "Pioggia", s: "🌧️", sd: "Debole" },
+            { m: "☀️", md: "Sole", p: "☀️", pd: "Sole", s: "🌙", sd: "Sereno" }
+        ];
+        
+        document.getElementById('forecast7').innerHTML = days.map((d, i) => {
+            const w = weather[i % 3];
+            return `
+            <div class="forecast-row">
+                <div class="forecast-day-header">
+                    <span class="day-name">${d}</span>
+                    <span class="day-temp">24° / 14°</span>
+                </div>
+                <div class="day-slots">
+                    <div class="slot"><span class="slot-label">Mattina</span><span class="slot-icon">${w.m}</span><span class="slot-desc">${w.md}</span></div>
+                    <div class="slot"><span class="slot-label">Pome</span><span class="slot-icon">${w.p}</span><span class="slot-desc">${w.pd}</span></div>
+                    <div class="slot"><span class="slot-label">Sera</span><span class="slot-icon">${w.s}</span><span class="slot-desc">${w.sd}</span></div>
+                </div>
+            </div>`;
+        }).join('');
+    }
 
-    updateApp(); checkAlerts(); setInterval(()=>{updateApp(); checkAlerts();}, 300000);
+    function showInfo(title, text) {
+        document.getElementById('infoTitle').innerText = title;
+        document.getElementById('infoText').innerText = text;
+        togglePanel('infoPanel', 1);
+    }
+
+    function updateZodiacDisplay() {
+        if(!userZodiac) return;
+        document.getElementById('zodiacCard').style.display = 'block';
+        const f = ["Grandi opportunità in arrivo.","Fidati del tuo intuito.","Giornata ideale per rilassarsi."];
+        document.getElementById('zodiacPhrase').innerText = `${userZodiac}: ${f[new Date().getDate() % 3]}`;
+    }
+
+    function saveZodiac(s) { userZodiac=s; localStorage.setItem('userZodiac',s); updateZodiacDisplay(); togglePanel('zodiacMenu',0); }
+    function togglePanel(id,s) { document.getElementById(id).style.display=s?'flex':'none'; }
+    
+    document.getElementById('zodiacSelector').innerHTML = signs.map(s => `<div class="zodiac-btn" onclick="saveZodiac('${s}')">${s}</div>`).join('');
+    updateAll();
+    setInterval(updateAll, 300000);
 </script>
 </body>
 </html>
