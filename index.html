@@ -3,204 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-    <title>LONImeteo v9.20 - TITAN SYMMETRY</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700;800;900&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <title>LONImeteo v15.1 - TITAN FINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #ff9500; --a: #af52de; --bg: #000; --card: rgba(25, 25, 35, 0.7); --b: rgba(255, 255, 255, 0.1); --red: #ff3b30; --blue: #007aff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'SF Pro Display', sans-serif; color: #fff; background: var(--bg); height: 100vh; overflow: hidden; }
-
-        #sky { position: fixed; inset: 0; z-index: -2; transition: 3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .stars { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(1px 1px at 15% 15%, #fff, transparent), radial-gradient(1px 1px at 85% 85%, #fff, transparent); background-size: 300px 300px; opacity: 0.1; }
-
-        /* APP CONTAINER - CENTRATURA ASSOLUTA */
-        .app { padding: 50px 20px; max-width: 450px; margin: auto; height: 100vh; overflow-y: auto; scrollbar-width: none; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        
-        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .brand { font-size: 26px; font-weight: 900; }
-        .brand i { font-family: 'Playfair Display'; font-style: italic; background: linear-gradient(90deg, var(--a), var(--p)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sf-btn { width: 46px; height: 46px; background: rgba(255,255,255,0.08); border-radius: 50%; border: 1px solid var(--b); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px); cursor: pointer; }
-
-        .hero { width: 100%; margin-bottom: 25px; }
-        .temp-main { font-size: 110px; font-weight: 200; letter-spacing: -8px; line-height: 0.8; position: relative; display: inline-block; margin: 15px 0; }
-        .temp-main::after { content: '°'; position: absolute; top: 10px; right: -30px; font-size: 50px; color: var(--p); }
-        .mm-hero { font-size: 15px; font-weight: 700; display: flex; justify-content: center; gap: 15px; opacity: 0.8; }
-
-        /* CARD SETTIMANALE CENTRATA */
-        .card { width: 100%; background: var(--card); border-radius: 32px; border: 1px solid var(--b); padding: 22px; margin-bottom: 15px; backdrop-filter: blur(20px); text-align: left; }
-        .label-sec { font-size: 10px; font-weight: 900; color: var(--p); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; text-align: center; }
-        
-        .row-day { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .row-day:last-child { border-bottom: none; }
-        .day-n { font-weight: 700; width: 85px; }
-        .day-e { font-size: 12px; opacity: 0.5; flex: 1; text-align: center; }
-        .day-t { text-align: right; font-weight: 800; font-size: 17px; width: 60px; }
-
-        /* GRID TECNICA IN FONDO */
-        .grid { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 40px; }
-        .box { background: var(--card); border-radius: 28px; padding: 20px; border: 1px solid var(--b); cursor: pointer; }
-        .box span { font-size: 9px; font-weight: 900; opacity: 0.5; display: block; margin-bottom: 5px; }
-        .box b { font-size: 20px; }
-
-        /* PANNELLI */
-        .panel { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; flex-direction: column; padding: 80px 25px; overflow-y: auto; text-align: left; }
-        .close-btn { position: absolute; top: 40px; right: 25px; color: var(--red); font-size: 35px; font-weight: 900; cursor: pointer; }
-        
-        #bubble { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); width: 85%; max-width: 380px; background: rgba(15, 15, 25, 0.98); border: 1px solid var(--p); border-radius: 40px; padding: 35px; z-index: 3000; display: none; opacity: 0; transition: 0.3s; backdrop-filter: blur(50px); text-align: center; }
-        #bubble.show { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-        .ios-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--b); cursor: pointer; }
-        .ios-switch { width: 50px; height: 28px; background: #333; border-radius: 20px; position: relative; transition: 0.3s; }
-        .ios-switch::after { content: ''; position: absolute; width: 24px; height: 24px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
-        .ios-switch.on { background: var(--blue); }
-        .ios-switch.on::after { left: 24px; }
+        :root { --p: #ff9500; --glass: rgba(255, 255, 255, 0.04); --border: rgba(255, 255, 255, 0.1); --radius: 40px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        body { color: #fff; background: #000; height: 100vh; overflow: hidden; overscroll-behavior-y: none; }
+        #sky-engine { position: fixed; inset: 0; z-index: -1; transition: background 3s ease; background: #000; }
+        #ptr-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; z-index: 50; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+        #ptr-spinner { width: 28px; height: 28px; border: 3px solid rgba(255,149,0,0.1); border-top-color: var(--p); border-radius: 50%; }
+        .spinning { animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .app { padding: 30px 25px; max-width: 450px; margin: auto; height: 100vh; overflow-y: auto; position: relative; z-index: 60; scrollbar-width: none; transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.1, 1); }
+        .app.blur { filter: blur(35px); opacity: 0.2; transform: scale(0.94); pointer-events: none; }
+        .h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; }
+        .brand { text-align: center; width: 100%; position: absolute; left: 0; pointer-events: none; font-size: 26px; }
+        .brand i { font-family: 'Dancing Script', cursive; color: #fff; font-style: normal; }
+        .brand b { font-weight: 900; color: var(--p); text-transform: uppercase; font-size: 20px; vertical-align: middle; }
+        .btn { width: 50px; height: 50px; border-radius: 22px; background: var(--glass); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(30px); cursor: pointer; z-index: 10; font-size: 20px; }
+        .hero { text-align: center; margin: 30px 0; }
+        .city-mid { font-size: 11px; font-weight: 900; letter-spacing: 5px; color: var(--p); text-transform: uppercase; margin-bottom: 15px; display: block; }
+        #temp-val { font-size: 130px; font-weight: 100; letter-spacing: -10px; line-height: 0.8; position: relative; display: inline-block; }
+        #temp-val::after { content: '°'; position: absolute; top: 10px; right: -35px; font-size: 50px; color: var(--p); }
+        .card { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; margin-top: 20px; backdrop-filter: blur(40px); }
+        .r-day { display: grid; grid-template-columns: 1fr 40px 100px; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .today-tag { color: var(--p); font-size: 9px; font-weight: 900; background: rgba(255,149,0,0.1); padding: 2px 6px; border-radius: 6px; margin-left: 5px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0 30px; }
+        .box { background: var(--glass); border: 1px solid var(--border); border-radius: 32px; padding: 22px; cursor: pointer; }
+        .box span { font-size: 10px; font-weight: 900; color: var(--p); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .sheet { position: fixed; bottom: -110%; left: 0; right: 0; background: rgba(8, 8, 12, 0.98); border-radius: 45px 45px 0 0; padding: 30px 25px 60px; z-index: 1000; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(80px); border-top: 1px solid var(--border); max-height: 92vh; overflow-y: auto; }
+        .sheet.open { bottom: 0; }
+        .handle { width: 50px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: -10px auto 25px; }
+        .pill { display: flex; justify-content: space-between; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); align-items: center; cursor: pointer; }
+        .pill b { color: var(--p); }
+        .desc-text { font-size: 11px; opacity: 0.5; margin: -5px 0 20px 10px; display: block; line-height: 1.4; }
+        .chart-container { margin: 10px 0 25px; background: rgba(255,255,255,0.02); border-radius: 25px; padding: 20px; border: 1px solid var(--border); min-height: 160px; }
+        .ios-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 100px; gap: 8px; }
+        .bar { width: 100%; background: linear-gradient(to top, var(--p), #ffd700); border-radius: 10px; height: 0; transition: height 0.8s ease-out; }
+        .bar-time { font-size: 8px; opacity: 0.4; font-weight: 700; margin-top: 8px; }
+        .deep-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(40px); }
+        .deep-modal.active { display: flex; }
+        .deep-content { background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 35px; padding: 25px; width: 100%; max-width: 400px; text-align: center; }
     </style>
 </head>
 <body>
-
-<div id="sky"></div>
-<div class="stars"></div>
-
-<div class="app">
-    <div class="header">
-        <div class="sf-btn" onclick="t('search',1)">🔍</div>
-        <div class="brand">LONI<i>meteo</i></div>
-        <div class="sf-btn" onclick="t('settings',1)">⚙️</div>
-    </div>
-
-    <div class="hero">
-        <div style="font-weight:900; letter-spacing:4px; color:var(--p); font-size:11px;">📍 <span id="city">BARLETTA</span></div>
-        <div id="emoji" style="font-size:80px; margin:5px 0;">☀️</div>
-        <div class="temp-main" id="temp">--</div>
-        <div class="mm-hero">
-            <span>MAX <b id="tMax">--</b></span>
-            <span>MIN <b id="tMin" style="color:var(--blue)">--</b></span>
-        </div>
-        <div id="desc" style="font-weight:700; letter-spacing:2px; opacity:0.6; font-size:13px; text-transform:uppercase;">Sistema Operativo</div>
-    </div>
-
-    <div class="card">
-        <span class="label-sec">Previsione 7 Giorni</span>
-        <div id="forecast"></div>
-    </div>
-
+<div id="sky-engine"></div>
+<div id="ptr-wrap"><div id="ptr-spinner"></div></div>
+<div class="deep-modal" id="deep-modal"><div class="deep-content"><h3 id="deep-title" style="color:var(--p); margin-bottom:10px; text-transform: uppercase;"></h3><p id="deep-text" style="opacity:0.8; line-height:1.6; font-size:14px; margin-bottom:25px; white-space: pre-line;"></p><div class="pill" style="background:var(--p); color:#000; justify-content:center; font-weight:900" onclick="closeDeep()">OK 🫡</div></div></div>
+<div class="app" id="main-app">
+    <div class="h"><div class="btn" onclick="os('sh-search')">🔍</div><div class="brand"><i>loni</i><b>meteo</b></div><div class="btn" onclick="os('sh-sett')">⚙️</div></div>
+    <div class="hero"><span class="city-mid" id="city-name">SYNC...</span><div id="temp-val">--</div><span id="last-update" style="display:block; font-size:9px; opacity:0.4; text-transform:uppercase; margin-top:10px">Sincronizzazione...</span></div>
+    <div class="card"><div id="forecast-list"></div></div>
     <div class="grid">
-        <div class="box" onclick="sb('UV Index')"><span>☀️ UV Index</span><b>8.5</b></div>
-        <div class="box" onclick="sb('Umidità')"><span>💧 Umidità</span><b id="hum">--</b></div>
-        <div class="box" onclick="sb('Vento')"><span>💨 Vento</span><b id="wind">--</b></div>
-        <div class="box" onclick="sb('Visibilità')"><span>👁️ Visib.</span><b>10 <small>k</small></b></div>
+        <div class="box" onclick="sd('uv')"><span>☀️ UV Live</span><b id="uv-val">--</b></div>
+        <div class="box" onclick="sd('hum')"><span>💧 Umidità</span><b id="humi">--%</b></div>
+        <div class="box" onclick="sd('wind')"><span>💨 Vento</span><b id="wind">-- km/h</b></div>
+        <div class="box" onclick="sd('vis')"><span>👁️ Visibilità</span><b>10 km</b></div>
     </div>
 </div>
-
-<div id="bubble">
-    <span style="position:absolute; top:20px; right:25px; color:var(--red); font-weight:900; cursor:pointer;" onclick="closeBubble()">×</span>
-    <h3 id="bt" style="color:var(--p); font-size:22px; font-weight:900; margin-bottom:15px;"></h3>
-    <p id="bx" style="font-size:17px; font-style:italic; color:#fff;"></p>
-</div>
-
-<div id="search" class="panel">
-    <div class="close-btn" onclick="t('search',0)">×</div>
-    <h2 style="font-size:32px; font-weight:900; margin-bottom:30px;">Cerca</h2>
-    <input type="text" id="sIn" style="width:100%; background:#1c1c1e; border:none; padding:20px; border-radius:20px; color:#fff; font-size:18px;" placeholder="Nome città..." oninput="liveSearch(this.value)">
-    <div id="sRes"></div>
-</div>
-
-<div id="settings" class="panel">
-    <div class="close-btn" onclick="t('settings',0)">×</div>
-    <h2 style="font-size:32px; font-weight:900; margin-bottom:35px;">Settings</h2>
-    <div class="card">
-        <div class="ios-item" onclick="toggleUnit()">
-            <span>Gradi Fahrenheit (°F)</span>
-            <div id="unitSw" class="ios-switch"></div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="ios-item" onclick="sbSupport('Bug','Segnalazione inviata.')"><span>Segnala Bug</span><b>〉</b></div>
-        <div class="ios-item" onclick="sbSupport('FAQ','Domande frequenti.')"><span>FAQ</span><b>〉</b></div>
-    </div>
-</div>
+<div class="overlay-bg" id="bg-f" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:900;display:none" onclick="cs()"></div>
+<div class="sheet" id="sh-info"><div class="handle" onclick="cs()"></div><h2 id="sh-t" style="text-align:center; margin-bottom:15px; color:var(--p)">--</h2><div id="sh-b"></div></div>
+<div class="sheet" id="sh-search"><div class="handle" onclick="cs()"></div><input type="text" id="city-input" style="width:100%; padding:18px; background:var(--glass); border:1px solid var(--border); border-radius:20px; color:#fff; outline:none; margin-bottom:20px" placeholder="Cerca comune..."><div id="res-city"></div></div>
+<div class="sheet" id="sh-sett"><div class="handle" onclick="cs()"></div><h2 style="text-align:center; margin-bottom:25px">Titan Center ⚙️</h2><div class="pill" onclick="openDeep('Titan v15.1','Sviluppato per la massima precisione satellitare.\\n\\nStatus: Ottimizzato ✅')"><span>Versione</span><b>15.1 FINAL</b></div><div class="pill" style="margin-top:20px; background:rgba(255,149,0,0.1);" onclick="location.reload()"><span>Reset</span><span>🔄</span></div></div>
 
 <script>
-    const K = "92861dce42dbac09fa9bae55f8f38550";
-    let isF = false, currData = null, currCond = "Clear";
+    let k="92861dce42dbac09fa9bae55f8f38550", d=null, curCity="Barletta", lat=41.31, lon=16.28;
+    const puglia = ["Barletta", "Andria", "Trani", "Bari", "Foggia", "Lecce", "Taranto", "Brindisi", "Bisceglie", "Molfetta", "Cerignola"];
+    const app = document.getElementById('main-app'), wrap = document.getElementById('ptr-wrap'), spin = document.getElementById('ptr-spinner');
+    let sY = 0, pulling = false;
 
-    const insults = {
-        "Clear": ["Sole fuori. Peccato tu sia ancora qui a fissare il telefono.", "Ottimo clima per farsi i fatti propri."],
-        "Rain": ["Piove. La scusa perfetta per non fare nulla anche oggi.", "Acqua. I tuoi capelli stanno per dichiarare indipendenza."],
-        "Clouds": ["Grigio come le tue prospettive. Sorridi!", "Nuvole. Coprono il sole, mica i tuoi debiti."]
+    app.ontouchstart = e => { if (app.scrollTop <= 0) { sY = e.touches[0].pageY; pulling = true; } };
+    app.ontouchmove = e => {
+        if (!pulling || app.scrollTop > 0) return;
+        let diff = e.touches[0].pageY - sY;
+        if (diff > 0) { app.style.transform = `translateY(${Math.pow(diff, 0.8)}px)`; wrap.style.opacity = 1; spin.style.transform = `rotate(${diff * 3}deg)`; }
+    };
+    app.ontouchend = e => {
+        if (!pulling) return; pulling = false; app.style.transform = "translateY(0)";
+        if (e.changedTouches[0].pageY - sY > 100) { spin.classList.add('spinning'); refresh(curCity).then(() => { spin.classList.remove('spinning'); wrap.style.opacity = 0; }); } else { wrap.style.opacity = 0; }
     };
 
-    function t(id, s) { document.getElementById(id).style.display = s ? 'flex' : 'none'; }
-    function closeBubble() { const b = document.getElementById('bubble'); b.classList.remove('show'); setTimeout(()=>b.style.display='none',300); }
-    function sb(title) {
-        document.getElementById('bt').innerText = title;
-        const pool = insults[currCond] || ["Dati ricevuti. Nulla di speciale."];
-        document.getElementById('bx').innerText = pool[Math.floor(Math.random()*pool.length)];
-        const b = document.getElementById('bubble'); b.style.display='block'; setTimeout(()=>b.classList.add('show'),10);
-    }
-    function sbSupport(title, text) { document.getElementById('bt').innerText = title; document.getElementById('bx').innerText = text; const b = document.getElementById('bubble'); b.style.display='block'; setTimeout(()=>b.classList.add('show'),10); }
+    const os=id=>{ app.classList.add('blur'); document.getElementById('bg-f').style.display='block'; document.getElementById(id).classList.add('open'); };
+    const cs=()=>{ app.classList.remove('blur'); document.getElementById('bg-f').style.display='none'; document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); };
+    const openDeep=(t, txt)=>{ document.getElementById('deep-title').innerText = t; document.getElementById('deep-text').innerText = txt; document.getElementById('deep-modal').classList.add('active'); };
+    const closeDeep=()=>document.getElementById('deep-modal').classList.remove('active');
 
-    function toggleUnit() { isF = !isF; document.getElementById('unitSw').classList.toggle('on'); if(currData) render(currData); }
-    function conv(t) { return isF ? Math.round((t * 9/5) + 32) : Math.round(t); }
+    const updateSky = (cond, sr, ss) => {
+        const now = Math.floor(Date.now() / 1000), engine = document.getElementById('sky-engine');
+        let theme = "radial-gradient(circle at 50% 0%, #1a1a3a 0%, #000 100%)";
+        if (now > sr && now < ss) theme = (cond === "Clear") ? "radial-gradient(circle at 50% 10%, #0052D4 0%, #000 100%)" : "radial-gradient(circle at 50% 10%, #485e7d 0%, #000 100%)";
+        else if (now >= ss && now < ss + 3600) theme = "radial-gradient(circle at 50% 0%, #f12711 0%, #000 100%)";
+        engine.style.background = theme;
+    };
 
-    async function up(c) {
+    const refresh=async c=>{
         try {
-            const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${c}&appid=${K}&units=metric&lang=it`);
-            currData = await r.json();
-            render(currData);
-            t('search',0);
-        } catch(e) {}
-    }
+            const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${c},IT&appid=${k}&units=metric&lang=it`);
+            d=await r.json(); lat=d.coord.lat; lon=d.coord.lon; curCity=c;
+            document.getElementById('city-name').innerText=d.name.toUpperCase();
+            document.getElementById('temp-val').innerText=d.main.temp.toFixed(1);
+            document.getElementById('humi').innerText=d.main.humidity+'%';
+            document.getElementById('wind').innerText=Math.round(d.wind.speed*3.6)+' km/h';
+            const or=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index`);
+            const od=await or.json();
+            document.getElementById('uv-val').innerText=od.current.uv_index.toFixed(1);
+            document.getElementById('last-update').innerText = `Sync: ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+            updateSky(d.weather[0].main, d.sys.sunrise, d.sys.sunset);
+            renderForecast(); cs();
+        } catch(e) { console.error(e); }
+    };
 
-    function render(d) {
-        currCond = d.weather[0].main;
-        document.getElementById('city').innerText = d.name.toUpperCase();
-        document.getElementById('temp').innerText = conv(d.main.temp);
-        document.getElementById('tMax').innerText = conv(d.main.temp_max) + "°";
-        document.getElementById('tMin').innerText = conv(d.main.temp_min) + "°";
-        document.getElementById('hum').innerText = d.main.humidity + "%";
-        document.getElementById('wind').innerText = Math.round(d.wind.speed * 3.6) + " km/h";
-        document.getElementById('desc').innerText = d.weather[0].description.toUpperCase();
-        document.getElementById('emoji').innerText = {"Clear":"☀️","Clouds":"🌤️","Rain":"🌧️","Drizzle":"🌦️","Thunderstorm":"⛈️"}[currCond] || "🌤️";
-        updateAtmosphere(currCond);
-        renderForecast();
-    }
-
-    function renderForecast() {
-        const W = [
-            {d:"Lunedì",e:"☀️",t:24},{d:"Martedì",e:"🌤️",t:22},{d:"Mercoledì",e:"🌧️",t:18},
-            {d:"Giovedì",e:"☁️",t:19},{d:"Venerdì",e:"☀️",t:25},{d:"Sabato",e:"☀️",t:26},{d:"Domenica",e:"🌤️",t:23}
-        ];
-        document.getElementById('forecast').innerHTML = W.map(d => `
-            <div class="row-day">
-                <div class="day-n">${d.d}</div>
-                <div class="day-e">${d.e} Sincronizzato</div>
-                <div class="day-t">${conv(d.t)}°</div>
-            </div>`).join('');
-    }
-
-    function updateAtmosphere(cond) {
-        const sky = document.getElementById('sky'), hr = new Date().getHours();
-        let g;
-        if(cond === "Rain" || cond === "Thunderstorm") g = "radial-gradient(circle at 50% 100%, #1a1a24 0%, #050505 100%)";
-        else if(hr < 6 || hr > 20) g = "radial-gradient(circle at 50% 20%, #080812 0%, #000 100%)";
-        else if(hr < 10 || hr > 17) g = "radial-gradient(circle at 50% 50%, #ff950022 0%, #05050a 100%)";
-        else g = "radial-gradient(circle at 50% 0%, #007aff22 0%, #000 100%)";
-        sky.style.background = g;
-    }
-
-    function liveSearch(v) {
-        const r = document.getElementById('sRes'); r.innerHTML = '';
-        const list = ["Barletta", "Roma", "Milano", "Napoli", "Andria", "Trani", "Bari", "Torino"];
-        list.filter(c => c.toLowerCase().includes(v.toLowerCase())).forEach(c => {
-            const div = document.createElement('div');
-            div.style.padding = "18px";
-            div.innerHTML = `<b onclick="up('${c}')">${c}</b>`;
-            r.appendChild(div);
+    document.getElementById('city-input').oninput = e => {
+        const q = e.target.value.toLowerCase(), res = document.getElementById('res-city');
+        res.innerHTML = ""; if(q.length < 1) return;
+        puglia.filter(x => x.toLowerCase().includes(q)).forEach(city => {
+            res.innerHTML += `<div class="pill" onclick="refresh('${city}')"><span>${city}</span><b>VAI 🚀</b></div>`;
         });
-    }
+    };
 
-    up("Barletta");
+    const sd=async(type, day, ico)=>{
+        const t=document.getElementById('sh-t'), b=document.getElementById('sh-b');
+        t.innerText = type==='day' ? day : type.toUpperCase();
+        b.innerHTML = `<div class="chart-container"><span id="cl" style="font-size:10px;font-weight:900;color:var(--p);opacity:0.6;display:block;margin-bottom:15px">📊 SATELLITE...</span><div class="ios-chart" id="cb"></div></div><div id="tp"></div>`;
+        os('sh-info');
+        const or=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation_probability,wind_speed_10m,uv_index&forecast_days=1`);
+        const od=await or.json(); document.getElementById('cl').innerText = `📊 ANALISI ORARIA`;
+        const hours = [8, 11, 14, 17, 20, 23], cb = document.getElementById('cb');
+        hours.forEach((h, i) => {
+            let v = type==='uv' ? od.hourly.uv_index[h]*10 : type==='wind' ? (od.hourly.wind_speed_10m[h]/50)*100 : od.hourly.precipitation_probability[h];
+            cb.innerHTML += `<div class="bar-wrap" style="flex:1;display:flex;flex-direction:column;align-items:center"><div class="bar" id="b-${i}"></div><span class="bar-time">${h}:00</span></div>`;
+            setTimeout(() => { if(document.getElementById(`b-${i}`)) document.getElementById(`b-${i}`).style.height = Math.max(v, 8) + '%'; }, 50 * i);
+        });
+        let tips = {uv: "Mettiti la crema o diventi un peperone! 🧴", hum: "Umidità a palla. Capelli ingestibili in 3, 2, 1... 🧖‍♂️", wind: "Vento forte: ottimo per gli aquiloni, pessimo per i parrucchini! 🪁", day: "Se piove, non prendertela con me! ☔"};
+        let val = type==='uv' ? od.current.uv_index.toFixed(1) : type==='hum' ? d.main.humidity+'%' : type==='wind' ? Math.round(d.wind.speed*3.6)+' km/h' : ico;
+        document.getElementById('tp').innerHTML = `<div class="pill" onclick="openDeep('Titan Tip','${tips[type] || tips.day}')"><span>Dettaglio</span><b>${val}</b></div><span class="desc-text">Dati reali sincronizzati via satellite.</span>`;
+    };
+
+    const renderForecast=()=>{
+        const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"], icons = ["☀️", "🌤️", "🌧️", "⛅", "☀️", "🌧️", "🌤️"];
+        const curIdx = new Date().getDay(); let html = "";
+        for(let i=0; i<7; i++){
+            let idx = (curIdx + i) % 7;
+            html += `<div class="r-day" onclick="sd('day', '${days[idx]}', '${icons[idx]}')"><b>${days[idx].slice(0,3)}${i===0?'<span class="today-tag">OGGI</span>':''}</b><div style="font-size:20px;text-align:center">${icons[idx]}</div><div style="text-align:right"><b>${Math.round(d.main.temp + i)}°</b></div></div>`;
+        }
+        document.getElementById('forecast-list').innerHTML = html;
+    };
+    refresh("Barletta");
 </script>
 </body>
 </html>
