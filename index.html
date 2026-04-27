@@ -80,13 +80,18 @@
 </div>
 
 <script>
-    // Rimuove il launch screen
+    // Gestione Schermata Iniziale
     window.addEventListener('load', () => {
-        setTimeout(() => { document.getElementById('launchScreen').style.opacity = '0'; 
-        setTimeout(() => document.getElementById('launchScreen').style.display = 'none', 800); }, 1500);
+        setTimeout(() => { 
+            const ls = document.getElementById('launchScreen');
+            if(ls) {
+                ls.style.opacity = '0'; 
+                setTimeout(() => ls.style.display = 'none', 800);
+            }
+        }, 1500);
     });
 
-    // Genera previsioni finte per riempire il vuoto
+    // Riempimento Rettangolo Previsioni
     const target = document.getElementById('forecastTarget');
     const hours = ["03", "04", "05", "06", "07", "08", "09"];
     const icons = ["🌙", "🌙", "🌙", "🌅", "☀️", "☀️", "☀️"];
@@ -100,13 +105,17 @@
             <div class="f-temp">${temps[i]}</div>
         </div>`;
     }
-    target.innerHTML = html;
+    if(target) target.innerHTML = html;
 
-    // Cambia sfondo in base all'ora reale
+    // Sfondo dinamico in base all'ora
     const h = new Date().getHours();
+    const mainIcon = document.getElementById('mainIcon');
     if (h > 6 && h < 19) {
         document.body.className = "bg-giorno";
-        document.getElementById('mainIcon').innerText = "☀️";
+        if(mainIcon) mainIcon.innerText = "☀️";
+    } else {
+        document.body.className = "bg-notte";
+        if(mainIcon) mainIcon.innerText = "🌙";
     }
 </script>
 </body>
