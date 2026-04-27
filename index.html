@@ -3,56 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Meteo Summer OS</title>
+    <title>Meteo Summer OS - Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { margin: 0; background: #000; font-family: -apple-system, sans-serif; color: white; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        
         #sky { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transition: 3s ease; overflow: hidden; }
         .day { background: linear-gradient(180deg, #0077b6, #f4a261); }
         .night { background: linear-gradient(180deg, #023e8a, #000); }
         .rainy-bg { background: linear-gradient(180deg, #4a4e69, #22223b) !important; }
+
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--d) infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         .drop { position: absolute; background: rgba(255,255,255,0.4); width: 1px; height: 15px; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(100vh); } }
+
         .celestial { position: absolute; border-radius: 50%; transition: all 2s ease-in-out; z-index: 1; transform: translate(-50%, -50%); }
         .sun { width: 50px; height: 50px; background: #ffcc33; box-shadow: 0 0 50px #ffcc33; }
         .moon { width: 35px; height: 35px; background: #fefae0; box-shadow: 0 0 25px rgba(255,255,255,0.3); }
+
         .liquid-glass { background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; }
-        #details-panel { position: fixed; bottom: -100%; left: 0; width: 100%; height: 62%; background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px); z-index: 1000; display: flex; flex-direction: column; padding: 30px; border-radius: 45px 45px 0 0; transition: bottom 0.4s cubic-bezier(0.2, 1, 0.3, 1); text-align: center; }
+        
+        .main-content { margin-top: 150px; } 
+
+        #details-panel { 
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 35%; 
+            background: rgba(15, 15, 15, 0.98); backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
+            z-index: 1000; display: flex; flex-direction: column; padding: 25px; 
+            border-radius: 40px 40px 0 0; transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1); text-align: center; 
+        }
         #details-panel.active { bottom: 0; }
-        .close-bar { width: 45px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: 0 auto 25px; }
-        .forecast-row { display: grid; grid-template-columns: 50px 40px 1fr 100px; align-items: center; padding: 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .close-bar { width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 10px; margin: 0 auto 15px; }
+
+        .forecast-row { display: grid; grid-template-columns: 50px 40px 1fr 100px; align-items: center; padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
     </style>
 </head>
 <body>
-    <div id="sky" class="day"><div id="celestial" class="celestial sun"></div><div id="star-field"></div><div id="rain-field"></div></div>
-    <div class="p-6 pb-32 max-w-md mx-auto">
-        <header class="pt-8 mb-6 flex justify-between items-center">
-            <div class="flex-1"><h1 id="city-name" class="text-4xl font-black tracking-tighter uppercase">Cerca</h1><p id="funny-quote" class="text-orange-100 italic text-sm mt-1">Caricamento...</p></div>
-            <button onclick="toggleSearch()" class="liquid-glass w-12 h-12 flex items-center justify-center active:scale-90 transition"><i class="fas fa-search"></i></button>
+    <div id="sky" class="day">
+        <div id="celestial" class="celestial sun"></div>
+        <div id="star-field"></div>
+        <div id="rain-field"></div>
+    </div>
+    
+    <div class="p-6 pb-32 max-w-md mx-auto main-content">
+        <header class="mb-6 flex justify-between items-center">
+            <div class="flex-1">
+                <h1 id="city-name" class="text-4xl font-black tracking-tighter uppercase leading-none">Barletta</h1>
+                <p id="funny-quote" class="text-orange-100 italic text-sm mt-2 opacity-80">Sintonizzazione...</p>
+            </div>
+            <button onclick="toggleSearch()" class="liquid-glass w-12 h-12 flex items-center justify-center active:scale-90 transition">
+                <i class="fas fa-search"></i>
+            </button>
         </header>
-        <div id="search-box" class="hidden mb-6"><input type="text" id="city-input" placeholder="Dove vuoi andare?" class="w-full bg-white/10 p-5 rounded-full border border-white/20 outline-none text-white text-center" onkeyup="if(event.key === 'Enter') searchCity()"></div>
-        <div id="pc-status" class="liquid-glass p-5 mb-8 border-l-8 border-green-500" onclick="showSunData()">
-            <p class="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest">Protezione Civile</p>
-            <p id="pc-text" class="text-xs font-bold">In aggiornamento...</p>
+
+        <div id="search-box" class="hidden mb-6">
+            <input type="text" id="city-input" placeholder="Cerca città..." class="w-full bg-white/10 p-5 rounded-full border border-white/20 outline-none text-white text-center" onkeyup="if(event.key === 'Enter') searchCity()">
         </div>
+
+        <div id="pc-status" class="liquid-glass p-5 mb-8 border-l-8 border-green-500" onclick="showSunData()">
+            <p class="text-[9px] font-black uppercase opacity-40 mb-1 tracking-widest text-left">Situazione</p>
+            <p id="pc-text" class="text-xs font-bold text-left">Caricamento...</p>
+        </div>
+
         <div class="flex flex-col items-center mb-10">
             <div id="temp-main" class="text-[100px] font-thin leading-none tracking-tighter">--°</div>
-            <div class="flex gap-10 mt-2 font-black text-sm uppercase"><span class="text-orange-300">↑ <span id="temp-max">--</span>°</span><span class="text-blue-300">↓ <span id="temp-min">--</span>°</span></div>
+            <div class="flex gap-10 mt-2 font-black text-sm uppercase">
+                <span class="text-orange-300">↑ <span id="temp-max">--</span>°</span>
+                <span class="text-blue-300">↓ <span id="temp-min">--</span>°</span>
+            </div>
         </div>
+
         <div class="grid grid-cols-2 gap-4 mb-8">
             <div class="liquid-glass p-5 flex flex-col items-center" onclick="openSub('Umidità', 'Livello attuale: --%');"><i class="fas fa-droplet text-blue-400 mb-2"></i><span id="val-hum" class="text-xl font-bold">--%</span></div>
             <div class="liquid-glass p-5 flex flex-col items-center" onclick="openSub('Vento', 'Intensità: --');"><i class="fas fa-wind text-white/70 mb-2"></i><span id="val-wind" class="text-xl font-bold">--</span></div>
-            <div class="liquid-glass p-5 flex flex-col items-center" onclick="openSub('Punto di Rugiada', 'Calcolo condizioni dell\'aria.');"><i class="fas fa-temperature-arrow-up text-orange-400 mb-2"></i><span id="val-dew" class="text-xl font-bold">--°</span></div>
-            <div class="liquid-glass p-5 flex flex-col items-center" onclick="openSub('Visibilità', 'Distanza visiva: --');"><i class="fas fa-eye text-green-400 mb-2"></i><span id="val-vis" class="text-xl font-bold">--</span></div>
+            <div class="liquid-glass p-5 flex flex-col items-center" onclick="openSub('Atmosfera', 'Dati atmosferici stabili.');"><i class="fas fa-temperature-arrow-up text-orange-400 mb-2"></i><span id="val-dew" class="text-xl font-bold">--°</span></div>
+            <div class="liquid-glass p-5 flex flex-col items-center" onclick="openSub('Vista', 'Visibilità: --');"><i class="fas fa-eye text-green-400 mb-2"></i><span id="val-vis" class="text-xl font-bold">--</span></div>
         </div>
+
         <div class="liquid-glass p-5"><div id="forecast-list"></div></div>
     </div>
-    <div id="details-panel" onclick="closeSub()"><div class="close-bar"></div><h2 id="sub-title" class="text-3xl font-black mb-4 uppercase tracking-tighter"></h2><p id="sub-desc" class="text-lg opacity-80 px-2 font-medium"></p><div class="mt-auto"><button class="w-full py-5 bg-white text-black rounded-full font-black uppercase">Ho capito</button></div></div>
+
+    <div id="details-panel" onclick="closeSub()">
+        <div class="close-bar"></div>
+        <h2 id="sub-title" class="text-2xl font-black mb-3 uppercase tracking-tighter"></h2>
+        <p id="sub-desc" class="text-base opacity-80 px-2 font-medium mb-6"></p>
+        <div class="mt-auto">
+            <button class="w-full py-4 bg-white/10 text-white rounded-full font-bold uppercase text-xs tracking-widest border border-white/10">Ok</button>
+        </div>
+    </div>
+
     <script>
-        const API_KEY = '8d2c8055da332e240b0d44325d2f2e7d';
+        const API_KEY = '92861dce42dbac09fa9bae55f8f38550';
         let currentCity = 'Barletta,IT';
         let sunInfo = { rise: '--:--', set: '--:--' };
         
@@ -62,12 +104,9 @@
             "Ogni raggio di sole è un'opportunità per brillare.",
             "Sii la versione più radiosa di te stesso oggi.",
             "Respira l'estate e lascia andare ogni pensiero.",
-            "Non aspettare il momento perfetto, rendilo dorato.",
             "Splendi senza chiedere il permesso a nessuno.",
             "L'energia del sole è dentro di te. Usala!",
-            "Oggi è il giorno giusto per inseguire i tuoi sogni.",
-            "Porta un po' di calore ovunque tu vada.",
-            "Il meglio deve ancora venire, proprio come il tramonto."
+            "Porta un po' di calore ovunque tu vada."
         ];
 
         function updateQuote() { document.getElementById('funny-quote').innerText = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`; }
@@ -87,14 +126,22 @@
             let start = isNight ? (h >= 20 ? 20 : -4) : 6, end = isNight ? (h >= 20 ? 30 : 6) : 20;
             const progress = (h - start) / (end - start);
             astro.style.left = `${progress * 100}%`;
-            astro.style.top = `${15 + (100 - (4 * progress * (1 - progress) * 100)) * 0.35}%`;
+            astro.style.top = `${8 + (100 - (4 * progress * (1 - progress) * 100)) * 0.25}%`;
             astro.className = `celestial ${isNight ? 'moon' : 'sun'}`;
         }
 
         async function sync() {
             try {
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(currentCity)}&units=metric&lang=it&appid=${API_KEY}`);
+                
+                if (res.status === 401) {
+                    document.getElementById('pc-text').innerText = "Attesa attivazione API...";
+                    return;
+                }
+                if (!res.ok) throw new Error();
+                
                 const d = await res.json();
+                
                 document.getElementById('city-name').innerText = d.name;
                 document.getElementById('temp-main').innerText = Math.round(d.main.temp) + '°';
                 document.getElementById('temp-max').innerText = Math.round(d.main.temp_max);
@@ -103,25 +150,32 @@
                 document.getElementById('val-wind').innerText = Math.round(d.wind.speed * 3.6) + ' km/h';
                 document.getElementById('val-vis').innerText = (d.visibility / 1000).toFixed(1) + ' km';
                 document.getElementById('val-dew').innerText = Math.round(d.main.temp - ((100 - d.main.humidity)/5)) + '°';
+                
                 sunInfo.rise = new Date(d.sys.sunrise * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 sunInfo.set = new Date(d.sys.sunset * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const pcBox = document.getElementById('pc-status');
+                
                 const isBad = d.wind.speed > 8 || d.weather[0].main.includes('Rain');
-                document.getElementById('pc-text').innerText = isBad ? "Avviso: Condizioni instabili" : "Situazione: Tutto sereno";
-                pcBox.style.borderColor = isBad ? "#fbbf24" : "#22c55e";
+                document.getElementById('pc-text').innerText = isBad ? "Situazione: Condizioni instabili" : "Situazione: Tutto sereno";
+                document.getElementById('pc-status').style.borderColor = isBad ? "#fbbf24" : "#22c55e";
+
                 updateCelestial(); renderSky(d.weather[0].main); renderForecast(d.main.temp, d.weather[0].main); updateQuote();
-            } catch (e) { currentCity = 'Barletta,IT'; sync(); }
+            } catch (e) { 
+                document.getElementById('pc-text').innerText = "Errore: Dati non disponibili";
+            }
         }
 
         function renderSky(cond) {
-            const isNight = new Date().getHours() < 6 || new Date().getHours() >= 20;
+            const h = new Date().getHours();
+            const isNight = h < 6 || h >= 20;
             const sky = document.getElementById('sky');
             sky.className = cond.toLowerCase().includes('rain') ? 'rainy-bg' : (isNight ? 'night' : 'day');
+            
             document.getElementById('star-field').innerHTML = ''; document.getElementById('rain-field').innerHTML = '';
+            
             if(isNight && !cond.toLowerCase().includes('rain')) {
                 for(let i=0; i<30; i++) {
                     const s = document.createElement('div'); s.className = 'star';
-                    s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*50+'%';
+                    s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*45+'%';
                     s.style.setProperty('--d', Math.random()*3+2+'s'); document.getElementById('star-field').appendChild(s);
                 }
             }
@@ -149,10 +203,12 @@
 
         function toggleSearch() { const box = document.getElementById('search-box'); box.classList.toggle('hidden'); if(!box.classList.contains('hidden')) document.getElementById('city-input').focus(); }
         function searchCity() { const input = document.getElementById('city-input'); if(input.value.trim()) { currentCity = input.value.trim(); sync(); toggleSearch(); input.value = ''; } }
-        function showSunData() { openSub('Dati Astronomici', `Alba: ${sunInfo.rise} | Tramonto: ${sunInfo.set}. Goditi la luce del sole.`); }
-        function openSub(title, desc) { document.getElementById('sub-title').innerText = title; document.getElementById('sub-desc').innerText = desc.replace('--', document.getElementById('val-hum').innerText); document.getElementById('details-panel').classList.add('active'); updateQuote(); }
-        function closeSub() { document.getElementById('details-panel').classList.remove('active'); updateQuote(); }
+        function showSunData() { openSub('Alba e Tramonto', `Alba: ${sunInfo.rise} | Tramonto: ${sunInfo.set}.`); }
+        function openSub(title, desc) { document.getElementById('sub-title').innerText = title; document.getElementById('sub-desc').innerText = desc.replace('--', document.getElementById('val-hum').innerText); document.getElementById('details-panel').classList.add('active'); }
+        function closeSub() { document.getElementById('details-panel').classList.remove('active'); }
+
         sync(); setInterval(sync, 600000);
+        setInterval(updateCelestial, 60000);
     </script>
 </body>
 </html>
