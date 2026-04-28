@@ -51,7 +51,8 @@ min-height:100vh;
 display:flex;
 flex-direction:column;
 align-items:center;
-padding-bottom:110px;
+/* FIX 2: increased padding-bottom to 140px so dock never covers last items */
+padding-bottom:140px;
 position:relative;
 overscroll-behavior:none;
 }
@@ -170,15 +171,64 @@ backdrop-filter:blur(20px);
 .tr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
 .tr-title{font-size:9px;font-weight:700;letter-spacing:3px;font-family:‘DM Mono’,monospace;opacity:0.55;text-transform:uppercase;}
 .tr-pct{font-size:10px;font-family:‘DM Mono’,monospace;font-weight:600;color:var(–a);opacity:0.85;}
-.tr-arc{position:relative;height:4px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:visible;}
+
+/* FIX 1: arc now overflow:visible so the dot icon can overflow cleanly */
+.tr-arc{
+position:relative;height:4px;background:rgba(255,255,255,0.06);border-radius:4px;
+overflow:visible; /* was hidden — needed for orb to show */
+margin:20px 0 8px; /* extra top margin so label above has room */
+}
 .tr-fill{height:100%;border-radius:4px;width:0%;transition:width 2.4s cubic-bezier(0.22,1,0.36,1);}
 .sol-fill{background:linear-gradient(90deg,rgba(212,175,55,0.1),var(–a),var(–a2));}
 .lun-fill{background:linear-gradient(90deg,rgba(160,200,255,0.1),#b8d8ff,#e8f4ff);}
-.tr-dot{width:16px;height:16px;border-radius:50%;position:absolute;top:50%;transform:translate(-50%,-50%);transition:left 2.4s cubic-bezier(0.22,1,0.36,1);z-index:2;}
-.sol-dot{background:radial-gradient(circle,#fffde0 0%,#ffe266 40%,var(–a) 100%);box-shadow:0 0 18px var(–a),0 0 36px rgba(212,175,55,0.5),0 0 64px rgba(212,175,55,0.2);}
-.lun-dot{background:radial-gradient(circle,#fff 0%,#e0eefc 50%,#b8d8ff 100%);box-shadow:0 0 14px #b8d8ff,0 0 28px rgba(160,210,255,0.45),0 0 50px rgba(160,210,255,0.15);}
+
+/* FIX 1: orb dots — now use emoji for the icon, properly sized and glow */
+.tr-dot{
+width:28px;height:28px;border-radius:50%;
+position:absolute;top:50%;transform:translate(-50%,-50%);
+transition:left 2.4s cubic-bezier(0.22,1,0.36,1);
+z-index:2;
+display:flex;align-items:center;justify-content:center;
+font-size:20px;line-height:1;
+}
+.sol-dot{
+background:radial-gradient(circle,#fffde0 0%,#ffe266 40%,var(–a) 100%);
+box-shadow:0 0 18px var(–a),0 0 36px rgba(212,175,55,0.5),0 0 64px rgba(212,175,55,0.2);
+filter:drop-shadow(0 0 8px rgba(255,220,80,0.9));
+}
+.lun-dot{
+background:radial-gradient(circle,#fff 0%,#e0eefc 50%,#b8d8ff 100%);
+box-shadow:0 0 14px #b8d8ff,0 0 28px rgba(160,210,255,0.45),0 0 50px rgba(160,210,255,0.15);
+filter:drop-shadow(0 0 6px rgba(180,220,255,0.8));
+}
+
 .tr-foot{display:flex;justify-content:space-between;margin-top:12px;font-size:10px;opacity:0.42;font-weight:500;}
-.tr-now-label{position:absolute;top:-22px;font-size:8px;letter-spacing:1px;font-family:‘DM Mono’,monospace;opacity:0.5;white-space:nowrap;transform:translateX(-50%);transition:left 2.4s cubic-bezier(0.22,1,0.36,1);}
+
+/* FIX 1: label above the orb — now positioned absolutely relative to arc */
+.tr-now-label{
+position:absolute;
+top:-20px;
+font-size:8px;letter-spacing:1px;
+font-family:‘DM Mono’,monospace;opacity:0.55;
+white-space:nowrap;
+transform:translateX(-50%);
+transition:left 2.4s cubic-bezier(0.22,1,0.36,1);
+color:var(–phase-accent);
+font-weight:700;
+text-shadow:0 0 8px var(–phase-accent);
+}
+
+/* FIX 1: percentage label below the orb */
+.tr-now-pct{
+position:absolute;
+top:18px;
+font-size:8px;letter-spacing:0.5px;
+font-family:‘DM Mono’,monospace;opacity:0.45;
+white-space:nowrap;
+transform:translateX(-50%);
+transition:left 2.4s cubic-bezier(0.22,1,0.36,1);
+font-weight:600;
+}
 
 /* ── ASTRAL PRECISION INDICATORS ── */
 .astral-transition{
@@ -319,7 +369,7 @@ display:flex;align-items:center;justify-content:space-between;cursor:pointer;
 .sub-sec-body{overflow:hidden;transition:max-height 0.3s ease,opacity 0.3s;max-height:0;opacity:0;}
 .sub-sec-body.open{max-height:400px;opacity:1;}
 
-/* ── SEARCH ── */
+/* ── FIX 4: SEARCH PANEL — keyboard-safe scrolling ── */
 .search-panel{
 position:fixed;inset:0;z-index:300;
 display:flex;flex-direction:column;align-items:center;
@@ -327,9 +377,17 @@ opacity:0;pointer-events:none;transition:opacity 0.3s;
 background:rgba(4,7,16,0.97);
 backdrop-filter:blur(50px) saturate(180%);
 -webkit-backdrop-filter:blur(50px) saturate(180%);
+/* Use dvh so on mobile the panel shrinks when keyboard appears */
+height:100dvh;
+overflow:hidden;
 }
 .search-panel.open{opacity:1;pointer-events:all;}
-.search-top{width:100%;max-width:420px;padding:60px 24px 16px;display:flex;gap:12px;align-items:center;}
+.search-top{
+width:100%;max-width:420px;
+padding:60px 24px 16px;
+display:flex;gap:12px;align-items:center;
+flex-shrink:0; /* header never shrinks */
+}
 .search-input{
 flex:1;background:var(–glass-md);border:1px solid var(–b);border-radius:14px;
 padding:13px 18px;font-size:16px;color:#fff;
@@ -338,7 +396,17 @@ backdrop-filter:var(–blur-sm);-webkit-backdrop-filter:var(–blur-sm);
 }
 .search-input::placeholder{opacity:0.35;}
 .search-cancel{font-size:14px;font-weight:600;color:var(–a);cursor:pointer;white-space:nowrap;opacity:0.85;}
-.search-results{width:100%;max-width:420px;padding:0 24px;overflow-y:auto;flex:1;scrollbar-width:none;}
+.search-results{
+width:100%;max-width:420px;
+padding:0 24px;
+/* FIX 4: flex:1 + overflow so results scroll within available space above keyboard */
+flex:1;
+overflow-y:auto;
+-webkit-overflow-scrolling:touch;
+scrollbar-width:none;
+/* Extra bottom padding so last item clears the dock when keyboard is hidden */
+padding-bottom:100px;
+}
 .search-results::-webkit-scrollbar{display:none;}
 .sec-title{font-size:9px;font-weight:700;letter-spacing:3px;opacity:0.28;text-transform:uppercase;font-family:‘DM Mono’,monospace;margin:16px 0 8px;}
 .city-item{
@@ -356,19 +424,31 @@ backdrop-filter:var(–blur-sm);-webkit-backdrop-filter:var(–blur-sm);
 /* ── PAGES ── */
 .page{display:none;width:100%;flex-direction:column;align-items:center;}.page.active{display:flex;}
 
-/* ── SETTINGS ── */
-.s-wrap{width:calc(100% - 48px);max-width:390px;}
+/* ── FIX 3: SETTINGS — reduce glow, ensure text sits above canvas ── */
+.s-wrap{
+width:calc(100% - 48px);max-width:390px;
+/* Explicit stacking context so text is never below canvas glow */
+position:relative;z-index:2;
+}
 .s-row{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid rgba(255,255,255,0.045);}
 .s-row:first-child{border-radius:var(–r) var(–r) 0 0;}.s-row:last-child{border:none;border-radius:0 0 var(–r) var(–r);}
 .s-lbl{font-size:14px;font-weight:600;}.s-sub{font-size:11px;opacity:0.36;margin-top:2px;font-weight:400;}.s-right{color:var(–a);font-size:11px;opacity:0.65;font-weight:600;}
+
+/* FIX 3: Toggle — active state uses gold, clearly distinct from off state */
 .toggle{
 width:52px;height:30px;
 background:rgba(255,255,255,0.08);
-border:1px solid rgba(255,255,255,0.12);
+border:1px solid rgba(255,255,255,0.14);
 border-radius:15px;position:relative;cursor:pointer;
-transition:background 0.3s,border-color 0.3s;flex-shrink:0;
+transition:background 0.3s,border-color 0.3s,box-shadow 0.3s;
+flex-shrink:0;
 }
-.toggle.on{background:var(–a);border-color:var(–a);}
+/* ON state: rich gold, glowing border, no ambiguity */
+.toggle.on{
+background:var(–a);
+border-color:var(–a2);
+box-shadow:0 0 12px rgba(212,175,55,0.45),0 0 4px rgba(212,175,55,0.25);
+}
 .toggle::after{
 content:’’;width:24px;height:24px;background:#fff;border-radius:50%;
 position:absolute;top:2px;left:2px;
@@ -376,6 +456,7 @@ transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
 box-shadow:0 2px 8px rgba(0,0,0,0.5);
 }
 .toggle.on::after{transform:translateX(22px);}
+
 .u-opts{display:flex;gap:5px;}
 .u-btn{
 padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;
@@ -409,6 +490,7 @@ border:1px solid rgba(255,255,255,0.12);
 border-radius:44px;padding:13px 30px;
 display:flex;gap:40px;
 box-shadow:0 16px 56px rgba(0,0,0,0.7),0 4px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.12),inset 0 -1px 0 rgba(0,0,0,0.2);
+/* FIX 2: dock z-index stays 50, padding-bottom on body handles clearance */
 z-index:50;
 }
 .dock::before{
@@ -463,6 +545,14 @@ border-radius:2px;transition:transform 0.5s ease;
 .precip-bar-bg{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
 .precip-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#4080cc,#7ab8ff);transition:width 0.5s ease;}
 .precip-label{font-size:9px;font-family:‘DM Mono’,monospace;opacity:0.45;width:30px;text-align:right;}
+
+/* FIX 3: Settings page — ensure all content has proper z-index above canvas glow */
+#page-settings .hero,
+#page-settings .sec,
+#page-settings .s-wrap{
+position:relative;
+z-index:2;
+}
 </style>
 
 </head>
@@ -521,8 +611,10 @@ border-radius:2px;transition:transform 0.5s ease;
       </div>
       <div class="tr-arc">
         <div class="tr-fill sol-fill" id="sol-fill"></div>
-        <div class="tr-dot sol-dot" id="sol-dot" style="left:0%"></div>
+        <!-- FIX 1: sol-dot is now the emoji icon node -->
+        <div class="tr-dot sol-dot" id="sol-dot" style="left:0%">☀️</div>
         <div class="tr-now-label" id="sol-now-label" style="left:0%">ORA</div>
+        <div class="tr-now-pct" id="sol-now-pct" style="left:0%">0%</div>
       </div>
       <div class="tr-foot">
         <span>🌅 <span id="sunrise">05:57</span></span>
@@ -538,7 +630,8 @@ border-radius:2px;transition:transform 0.5s ease;
       </div>
       <div class="tr-arc">
         <div class="tr-fill lun-fill" id="lun-fill"></div>
-        <div class="tr-dot lun-dot" id="lun-dot" style="left:0%"></div>
+        <!-- FIX 1: lun-dot is the moon emoji icon node -->
+        <div class="tr-dot lun-dot" id="lun-dot" style="left:0%">🌙</div>
       </div>
       <div class="tr-foot">
         <span>🌑 <span id="moonrise">21:14</span></span>
@@ -704,7 +797,6 @@ function drawSky(){
   gd.addColorStop(1,lHex(cP.b,tP.b,lT));
   cx.fillStyle=gd;cx.fillRect(0,0,W,H);
 
-  // Phase-specific extra gradients
   const ph=S?S.skyPhase:'night';
   const now2=new Date();const hr=now2.getHours()+now2.getMinutes()/60;
 
@@ -716,7 +808,6 @@ function drawSky(){
     const clr=ph==='dawn'?'255,100,30':ph==='golden'?'255,140,20':'255,60,15';
     sg.addColorStop(0,`rgba(${clr},0.55)`);sg.addColorStop(0.5,`rgba(${clr},0.12)`);sg.addColorStop(1,'rgba(0,0,0,0)');
     cx.fillStyle=sg;cx.fillRect(0,0,W,H);
-    // Horizon glow
     const hg=cx.createLinearGradient(0,H*0.35,0,H*0.7);
     hg.addColorStop(0,'rgba(0,0,0,0)');hg.addColorStop(0.5,`rgba(${clr},0.18)`);hg.addColorStop(1,'rgba(0,0,0,0)');
     cx.fillStyle=hg;cx.fillRect(0,0,W,H);
@@ -730,7 +821,6 @@ function drawSky(){
     cx.fillStyle=sg;cx.fillRect(0,0,W,H);
   }
 
-  // Sun/Moon orb
   const isNight=ph==='night'||ph==='midnight'||ph==='dusk';
   const inDay=hr>=S.sunriseH&&hr<=S.sunsetH;
   if(inDay&&!isNight&&ph!=='rain'&&ph!=='storm'){
@@ -758,7 +848,6 @@ function drawStars(){
     const a=alpha*s.a*(0.6+0.4*Math.sin(s.ph));
     cx.beginPath();cx.arc(s.x,s.y,s.r,0,6.28);
     cx.fillStyle=`rgba(255,255,255,${a})`;cx.fill();
-    // Bigger stars get a glow
     if(s.size>0.85){
       cx.beginPath();cx.arc(s.x,s.y,s.r*3,0,6.28);
       cx.fillStyle=`rgba(255,255,255,${a*0.15})`;cx.fill();
@@ -799,7 +888,6 @@ function drawLightning(){
   cx.beginPath();let y=0,lx=x;
   while(y<H*0.6){const ny=y+30+Math.random()*40;const nx=lx+(Math.random()-0.5)*60;cx.lineTo(nx,ny);y=ny;lx=nx;}
   cx.stroke();
-  // Flash
   cx.fillStyle='rgba(200,220,255,0.06)';cx.fillRect(0,0,W,H);
 }
 
@@ -811,7 +899,7 @@ function skyLoop(){
 }
 
 /* ════════════════════════════════════════
-   SOLAR POSITION — PRECISE CALCULATION (SPA simplified)
+   SOLAR POSITION CALCULATION (SPA)
 ════════════════════════════════════════ */
 function toRad(d){return d*Math.PI/180;}
 function toDeg(r){return r*180/Math.PI;}
@@ -828,21 +916,18 @@ function getSolarTimes(lat,lon,date){
   const eqT=4*(toDeg(toRad(L)-ra));
   const latR=toRad(lat);
   const cosH=(-Math.sin(toRad(-0.833))-Math.sin(latR)*Math.sin(dec))/(Math.cos(latR)*Math.cos(dec));
-  if(cosH<-1||cosH>1)return null; // polar
+  if(cosH<-1||cosH>1)return null;
   const H0=toDeg(Math.acos(cosH));
   const tz=date.getTimezoneOffset()/(-60);
   const transit=12-(lon/15)-eqT/60+tz;
   const rise=transit-H0/15;
   const set=transit+H0/15;
-  // Civil twilight (-6°)
   const cosCiv=(-Math.sin(toRad(-6))-Math.sin(latR)*Math.sin(dec))/(Math.cos(latR)*Math.cos(dec));
   let civRise=null,civSet=null;
   if(cosCiv>=-1&&cosCiv<=1){const Hciv=toDeg(Math.acos(cosCiv));civRise=transit-Hciv/15;civSet=transit+Hciv/15;}
-  // Nautical (-12°)
   const cosNaut=(-Math.sin(toRad(-12))-Math.sin(latR)*Math.sin(dec))/(Math.cos(latR)*Math.cos(dec));
   let nautRise=null,nautSet=null;
   if(cosNaut>=-1&&cosNaut<=1){const Hnaut=toDeg(Math.acos(cosNaut));nautRise=transit-Hnaut/15;nautSet=transit+Hnaut/15;}
-  // Astronomical (-18°)
   const cosAstr=(-Math.sin(toRad(-18))-Math.sin(latR)*Math.sin(dec))/(Math.cos(latR)*Math.cos(dec));
   let astrRise=null,astrSet=null;
   if(cosAstr>=-1&&cosAstr<=1){const Hastr=toDeg(Math.acos(cosAstr));astrRise=transit-Hastr/15;astrSet=transit+Hastr/15;}
@@ -869,7 +954,7 @@ function decimalToHHMM(h){
 function getMoonPhase(date){
   const jd=getJulianDay(date);
   const lunarCycle=29.53058867;
-  const knownNew=2451550.1; // Jan 6, 2000 new moon
+  const knownNew=2451550.1;
   const daysSince=(jd-knownNew)%lunarCycle;
   const age=(daysSince+lunarCycle)%lunarCycle;
   const illumination=Math.round(50*(1-Math.cos(2*Math.PI*age/lunarCycle)));
@@ -888,13 +973,11 @@ function getMoonPhase(date){
 }
 
 function getMoonTimes(lat,lon,date){
-  // Approximate moonrise/moonset
   const jd=getJulianDay(date);
   const lunarCycle=29.53058867;
   const knownNew=2451550.1;
   const daysSince=(jd-knownNew)%lunarCycle;
   const age=((daysSince+lunarCycle)%lunarCycle);
-  // Moon rises ~50min later each day vs sun
   const baseRise=6+age*(24/lunarCycle)*0.5;
   const rise=((baseRise+age*0.82)%24);
   const set=(rise+12.5)%24;
@@ -1118,16 +1201,16 @@ function wSVG(data,color,h=90,mini=false){
 }
 
 /* ════════════════════════════════════════
-   PHASE DETECTION — PRECISE
+   PHASE DETECTION
 ════════════════════════════════════════ */
 function getPhase(h,cond){
   if(cond&&/tempest|fulmin/i.test(cond))return'storm';
   if(cond&&/pioggi|rovescio|grandine/i.test(cond))return'rain';
   if(cond&&/neve/i.test(cond))return'snow';
   const sr=S.sunriseH||5.95,ss=S.sunsetH||19.75;
-  const civ_sr=sr-0.5,civ_ss=ss+0.42;     // Civil twilight ~25min
-  const naut_sr=sr-1.0,naut_ss=ss+1.0;    // Nautical ~1h
-  const golden_start=ss-1.0,golden_end=ss-0.25; // Golden hour
+  const civ_sr=sr-0.5,civ_ss=ss+0.42;
+  const naut_sr=sr-1.0,naut_ss=ss+1.0;
+  const golden_start=ss-1.0,golden_end=ss-0.25;
   if(h<naut_sr||h>=naut_ss+1.5)return'midnight';
   if(h<civ_sr||h>=civ_ss+0.75)return h<sr?'dawn':'dusk';
   if(h<sr)return'dawn';
@@ -1154,7 +1237,7 @@ function updateDate(){
 }
 
 /* ════════════════════════════════════════
-   ASTRAL TRACKERS — PRECISE
+   FIX 1: ASTRAL TRACKERS — Dynamic icon + percentage label
 ════════════════════════════════════════ */
 function updateTrackers(){
   const now=new Date();
@@ -1166,13 +1249,25 @@ function updateTrackers(){
   sp=Math.max(0,Math.min(100,sp));
   const inDay=cur>=sr&&cur<=ss;
 
-  const sd=document.getElementById('sol-dot');
-  if(sd)sd.style.left=sp+'%';
+  // FIX 1: update dot position AND the percentage label below it
+  const solDot=document.getElementById('sol-dot');
+  if(solDot){
+    solDot.style.left=sp+'%';
+    // Dynamic icon: sun during day, moon-like glow at night
+    solDot.textContent=inDay?'☀️':'🌙';
+  }
   const sf=document.getElementById('sol-fill');
   if(sf)sf.style.width=sp+'%';
   const snl=document.getElementById('sol-now-label');
   if(snl)snl.style.left=sp+'%';
+  // FIX 1: percentage of day progress label
+  const snp=document.getElementById('sol-now-pct');
+  if(snp){
+    snp.style.left=sp+'%';
+    snp.textContent=Math.round(sp)+'%';
+  }
 
+  // Countdown label (top-right of block)
   const sp2=document.getElementById('sol-pct');
   if(sp2){
     if(inDay){
@@ -1191,7 +1286,7 @@ function updateTrackers(){
   if(S.moonTimes){
     const mr=S.moonTimes.rise,ms=S.moonTimes.set;
     let lp=0;
-    if(mr>ms){// Crosses midnight
+    if(mr>ms){
       if(cur>=mr)lp=((cur-mr)/((24-mr)+ms))*100;
       else if(cur<=ms)lp=(((24-mr)+cur)/((24-mr)+ms))*100;
       else lp=0;
@@ -1199,7 +1294,12 @@ function updateTrackers(){
       if(cur>=mr&&cur<=ms)lp=((cur-mr)/(ms-mr))*100;
     }
     lp=Math.max(0,Math.min(100,lp));
-    const ld=document.getElementById('lun-dot');if(ld)ld.style.left=lp+'%';
+    const ld=document.getElementById('lun-dot');
+    if(ld){
+      ld.style.left=lp+'%';
+      // FIX 1: moon icon reflects current phase
+      ld.textContent=S.moonData?S.moonData.phaseIcon:'🌙';
+    }
     const lf=document.getElementById('lun-fill');if(lf)lf.style.width=lp+'%';
   }
 
@@ -1209,7 +1309,6 @@ function updateTrackers(){
     if(lp2)lp2.textContent=`${S.moonData.phaseIcon} ${S.moonData.phaseName} · ${S.moonData.illumination}%`;
   }
 
-  // Transition banner
   updateAstralTransitionBanner(cur,sr,ss);
 }
 
@@ -1318,7 +1417,6 @@ function updateUI(){
   const tf=document.getElementById('t-feels');if(tf)tf.textContent=fmtTemp2(S.feelsC);
   const cp=document.getElementById('cond-pill');if(cp)cp.textContent=S.condIcon+' '+S.condition;
 
-  // Sunrise/sunset
   if(S.solarTimes){
     const sre=document.getElementById('sunrise');if(sre)sre.textContent=decimalToHHMM(S.solarTimes.rise);
     const sse=document.getElementById('sunset');if(sse)sse.textContent=decimalToHHMM(S.solarTimes.set);
@@ -1328,7 +1426,6 @@ function updateUI(){
     }
   }
 
-  // Phase on body class
   document.body.className='phase-'+S.skyPhase;
 
   const lu=document.getElementById('last-upd');const now=new Date();
@@ -1336,7 +1433,6 @@ function updateUI(){
   const gs=document.getElementById('geo-status');
   if(gs)gs.textContent=navigator.geolocation?'✅ Disponibile':'❌ Non disponibile';
 
-  // Unit buttons sync
   ['uc','uf'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('sel');});
   const cu=document.getElementById(S.units.temp==='C'?'uc':'uf');if(cu)cu.classList.add('sel');
   ['ukmh','ums','ukt'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('sel');});
@@ -1551,7 +1647,6 @@ function setSheet(html){
   document.getElementById('sheet-body').innerHTML=html;
   document.getElementById('overlay').classList.add('open');
   document.getElementById('sheet').classList.add('open');
-  // Scroll sheet to top
   document.getElementById('sheet').scrollTop=0;
 }
 function closeSheet(){
@@ -1672,7 +1767,6 @@ function togEl(el){el.classList.toggle('on');}
 
 function setU(type,val){
   S.units[type]=val;
-  // Reset all buttons for that type
   const map={
     temp:['uc','uf'],
     wind:['ukmh','ums','ukt'],
@@ -1682,7 +1776,6 @@ function setU(type,val){
   if(map[type])map[type].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('sel');});
   const idMap={temp:{C:'uc',F:'uf'},wind:{kmh:'ukmh',ms:'ums',kt:'ukt'},pressure:{hpa:'uhpa',mmhg:'ummhg'},vis:{km:'ukm',mi:'umi'}};
   if(idMap[type]&&idMap[type][val]){const el=document.getElementById(idMap[type][val]);if(el)el.classList.add('sel');}
-  // Re-render with new units
   updateUI();renderFC();renderWidgets();renderHourly();renderOutfit();
 }
 
@@ -1694,7 +1787,6 @@ function goPage(p){
   document.querySelectorAll('.nav-i').forEach(e=>e.classList.remove('active'));
   const pg=document.getElementById('page-'+p);if(pg)pg.classList.add('active');
   const nv=document.getElementById('nav-'+p);if(nv)nv.classList.add('active');
-  // Scroll to top when switching pages
   window.scrollTo({top:0,behavior:'smooth'});
   if(p==='settings')renderEditor();
 }
@@ -1741,7 +1833,6 @@ function applyWeather(wx){
     });
     buildFC(from);
 
-    // Apply hourly data if available
     if(wx.hourly){
       const nowH=new Date().getHours();
       HOURLY=Array.from({length:24},(_,h)=>{
@@ -1834,12 +1925,9 @@ function hideIntro(){
    INIT
 ════════════════════════════════════════ */
 window.onload=()=>{
-  // Scroll to top immediately
   window.scrollTo(0,0);
-
   rz();skyLoop();
 
-  // Set initial phase
   const h=new Date().getHours();
   const ip=getPhase(h,'');
   S.skyPhase=ip;
@@ -1848,17 +1936,14 @@ window.onload=()=>{
 
   animBar();setIG('Rilevamento posizione GPS…');
 
-  // Initial compute
   computeAstronomy();
   buildFC();
   updateDate();
   updateUI();
   renderAll();
 
-  // Start geo
   initGeo();
 
-  // Ticker
   setInterval(()=>{
     const now=new Date();
     updateTrackers();
@@ -1868,7 +1953,6 @@ window.onload=()=>{
   },30000);
 };
 
-// Scroll to top on page load
 document.addEventListener('DOMContentLoaded',()=>{window.scrollTo(0,0);});
 </script>
 
